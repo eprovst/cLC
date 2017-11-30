@@ -1,6 +1,9 @@
 package LamCalc
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 func intToLetter(num int) string {
 	if num < 3 {
@@ -31,7 +34,7 @@ func (lx LamExpr) deDebruijn(boundLetters []string, nextletter int) string {
 		switch part := part.(type) {
 		case int:
 			if part < int(len(boundLetters)) && boundLetters[part] != "" {
-				result += boundLetters[part]
+				result += boundLetters[part] + " "
 			} else {
 				newLetter := intToLetter(nextletter)
 				nextletter++
@@ -41,21 +44,21 @@ func (lx LamExpr) deDebruijn(boundLetters []string, nextletter int) string {
 				}
 
 				boundLetters = append(boundLetters, newLetter)
-				result += newLetter
+				result += newLetter + " "
 			}
 
 		case LamFunc:
 			if len(lx) == 1 {
 				result += part.deDebruijn(boundLetters, nextletter)
 			} else {
-				result += "(" + part.deDebruijn(boundLetters, nextletter) + ")"
+				result = strings.TrimSuffix(result, " ") + "(" + part.deDebruijn(boundLetters, nextletter) + ") "
 			}
 
 		case LamExpr:
 			if len(lx) == 1 {
 				result += part.deDebruijn(boundLetters, nextletter)
 			} else {
-				result += "(" + part.deDebruijn(boundLetters, nextletter) + ")"
+				result = strings.TrimSuffix(result, " ") + "(" + part.deDebruijn(boundLetters, nextletter) + ") "
 			}
 
 		default:
@@ -63,7 +66,7 @@ func (lx LamExpr) deDebruijn(boundLetters []string, nextletter int) string {
 		}
 	}
 
-	return result
+	return strings.TrimSuffix(result, " ")
 }
 
 // String returns the Lambda Function as a string
