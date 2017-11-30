@@ -2,15 +2,19 @@ package LamCalc
 
 import "reflect"
 
-// LamTerm is a general type to represent both LamExprns and LamFuncs.
+// LamTerm is a general type to represent both LamExprns and LamFuncs
 type LamTerm interface {
-	Equals(other LamTerm) bool
-	String() string
-	deDebruijn(boundLetters []string, nextletter int) string
-
 	// Allow us to manipulate it as a list
 	Len() int
 	Index(int) interface{}
+	Append(...interface{}) LamTerm
+
+	// Equality checking (is the same as alpha equivalence because of the De Bruijn indexes)
+	Equals(other LamTerm) bool
+
+	// Lambda print
+	String() string
+	deDeBruijn(boundLetters []string, nextletter int) string
 }
 
 // LamExpr is a list of lamfuncs, lamexprns and De Bruijn indexes (all lowered by one) which isn't a function itself.
@@ -24,6 +28,11 @@ func (lx LamExpr) Len() int {
 // Index returns the ith element of the LamExpr
 func (lx LamExpr) Index(i int) interface{} {
 	return lx[i]
+}
+
+// Append allows us to append to the LamExpr
+func (lx LamExpr) Append(terms ...interface{}) LamTerm {
+	return append(lx, terms...)
 }
 
 // Equals checks wether the LamExp is identical to a LamTerm
@@ -72,6 +81,11 @@ func (lf LamFunc) Len() int {
 // Index returns the ith element of the LamFunc
 func (lf LamFunc) Index(i int) interface{} {
 	return lf[i]
+}
+
+// Append allows us to append to the LamFunc
+func (lf LamFunc) Append(terms ...interface{}) LamTerm {
+	return append(lf, terms...)
 }
 
 // Equals checks wether two LamFuncs are identical

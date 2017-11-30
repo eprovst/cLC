@@ -13,7 +13,7 @@ import (
 
 func main() {
 	// Prepare some sort of demo
-	Y := LamCalc.LamFunc{
+	/*Y := LamCalc.LamFunc{
 		0,
 		LamCalc.LamFunc{
 			1,
@@ -29,7 +29,7 @@ func main() {
 				0,
 			},
 		},
-	}
+	}*/
 
 	if len(os.Args) > 1 {
 		file, err := os.Open(os.Args[1])
@@ -69,8 +69,9 @@ func main() {
 			clearCmd.Run()
 
 		default:
-			fmt.Print("\nY =\n\n")
-			fmt.Print("    " + Y.String() + "\n\n")
+			//fmt.Print("\nY =\n\n")
+			lx := LamCalc.ParseString(command, map[string]int{}, map[string]LamCalc.LamFunc{})
+			fmt.Print("    " + lx.String() + "\n\n")
 		}
 	}
 }
