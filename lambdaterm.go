@@ -15,6 +15,11 @@ type LamTerm interface {
 	// Lambda print
 	String() string
 	deDeBruijn(boundLetters []string, nextletter int) string
+
+	// Lambda expand
+	Substitute(int, LamTerm) LamTerm
+	ExpandOnce() LamTerm
+	Expand() LamFunc
 }
 
 // LamExpr is a list of lamfuncs, lamexprns and De Bruijn indexes (all lowered by one) which isn't a function itself.

@@ -1,9 +1,14 @@
 package LamCalc
 
-import "reflect"
+import (
+	"errors"
+	"reflect"
+)
+
+// TODO: Improve accuracy of error messages.
 
 // ParseString turns the input into a LamTerm
-func ParseString(expr string, boundVars map[string]int, globals map[string]LamFunc) LamTerm {
+func ParseString(expr string, boundVars map[string]int, globals map[string]LamFunc) (LamTerm, error) {
 	var term LamTerm
 
 	i := 0
@@ -28,6 +33,10 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 			fvar += string(expr[i])
 		}
 		i++ // Skip the .
+
+		if fvar == "" {
+			return term, errors.New("No local variable specified in function")
+		}
 
 		// Add the function variable to the boundvars map
 		boundVars[fvar] = 0
@@ -62,7 +71,11 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 				}
 			} // After this loop i points at the closing bracket
 
-			cterm = ParseString(expr[starte:i], boundVars, globals)
+			cterm, err := ParseString(expr[starte:i], boundVars, globals)
+
+			if err != nil {
+				return term, err
+			}
 
 			// Simplify expressions
 			if reflect.TypeOf(cterm).String() == "LamCalc.LamExpr" && cterm.(LamExpr).Len() == 1 {
@@ -100,20 +113,20 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 				if ok {
 					term = term.Append(cfnc)
 				} else {
-					panic("'" + cvar + "' not yet defined")
+					return term, errors.New("'" + cvar + "' not yet defined")
 				}
 			}
 		}
 	}
 
 	// Simplify functions
-	if reflect.TypeOf(term).String() == "LamCalc.LamFunc" && term.Len() == 1 {
-		iterm := term.Index(0)
-
-		if reflect.TypeOf(iterm).String() == "LamCalc.LamExpr" {
-			term = LamFunc(iterm.(LamExpr))
+	if term.Len() <= 1 {
+		if term.Len() == 0 {
+			return term, errors.New("No function body present")
 		}
+
+		term = term.Index(0).(LamTerm)
 	}
 
-	return term
+	return term, nil
 }

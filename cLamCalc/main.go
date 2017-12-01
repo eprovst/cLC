@@ -12,8 +12,8 @@ import (
 )
 
 func main() {
-	// Prepare some sort of demo
-	/*Y := LamCalc.LamFunc{
+	// Prepare some basic combinators
+	Y := LamCalc.LamFunc{
 		0,
 		LamCalc.LamFunc{
 			1,
@@ -29,7 +29,42 @@ func main() {
 				0,
 			},
 		},
-	}*/
+	}
+
+	S := LamCalc.LamFunc{
+		LamCalc.LamFunc{
+			LamCalc.LamFunc{
+				2,
+				0,
+				LamCalc.LamExpr{
+					1,
+					0,
+				},
+			},
+		},
+	}
+
+	K := LamCalc.LamFunc{
+		LamCalc.LamFunc{
+			1,
+		},
+	}
+
+	Ks := LamCalc.LamFunc{
+		LamCalc.LamFunc{
+			0,
+		},
+	}
+
+	I := LamCalc.LamFunc{0}
+
+	globals := map[string]LamCalc.LamFunc{
+		"Y":  Y,
+		"S":  S,
+		"K":  K,
+		"K*": Ks,
+		"I":  I,
+	}
 
 	if len(os.Args) > 1 {
 		file, err := os.Open(os.Args[1])
@@ -52,6 +87,7 @@ func main() {
 		command = strings.TrimSpace(command)
 
 		// Commandline commands
+		// TODO: Extend functionality
 		switch command {
 		case "exit":
 			os.Exit(0)
@@ -69,9 +105,15 @@ func main() {
 			clearCmd.Run()
 
 		default:
-			//fmt.Print("\nY =\n\n")
-			lx := LamCalc.ParseString(command, map[string]int{}, map[string]LamCalc.LamFunc{})
-			fmt.Print("    " + lx.String() + "\n\n")
+			// TODO: Is there an elemgant way to stop computation?
+			lx, err := LamCalc.ParseString(command, map[string]int{}, globals)
+
+			if err != nil {
+				fmt.Println("Error: " + err.Error())
+			} else {
+				fmt.Print("\n" + lx.String() + " =\n\n")
+				fmt.Print("    " + lx.Expand().String() + "\n\n")
+			}
 		}
 	}
 }
