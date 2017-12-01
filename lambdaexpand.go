@@ -2,7 +2,7 @@ package LamCalc
 
 import "reflect"
 
-// TODO: Do a lot of testing to see if this acctualy works...
+// TODO: Simplfy code, oh and probably doesn't work...
 
 // Substitute replaces index by sub
 func (lf LamFunc) Substitute(index int, sub LamTerm) LamTerm {
@@ -98,7 +98,7 @@ func (lx LamExpr) ExpandOnce() LamTerm {
 	case LamExpr:
 		nw = append(nw, term.Expand())
 		if len(lx) > 1 {
-			nw = append(nw, lx[1:])
+			nw = append(nw, lx[1:]...)
 		}
 
 		return nw
@@ -107,7 +107,7 @@ func (lx LamExpr) ExpandOnce() LamTerm {
 		if len(lx) > 1 {
 			nw = append(nw, term.Insert(lx[1].(LamTerm)))
 			if len(lx) > 2 {
-				return append(nw, lx[2:])
+				return append(nw, lx[2:]...)
 			}
 
 			return nw[0].(LamExpr)

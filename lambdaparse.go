@@ -14,6 +14,10 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 	i := 0
 
 	if expr[i] == 'L' {
+		if len(expr) < 3 {
+			return term, errors.New("No local variable specified in function")
+		}
+
 		i++
 		term = LamFunc{}
 
@@ -29,14 +33,15 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 		// Now get the name of the currently bound variable
 		fvar := ""
 
-		for ; expr[i] != '.'; i++ {
+		for ; i < len(expr) && expr[i] != '.'; i++ {
 			fvar += string(expr[i])
 		}
-		i++ // Skip the .
 
-		if fvar == "" {
-			return term, errors.New("No local variable specified in function")
+		if i == len(expr) {
+			return term, errors.New("Function body not started")
 		}
+
+		i++ // Skip the .
 
 		// Add the function variable to the boundvars map
 		boundVars[fvar] = 0
@@ -49,8 +54,14 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 		switch expr[i] {
 		case 'L':
 			// Start of function, the rest of the expression is part of it
-			term = term.Append(ParseString(expr[i:], boundVars, globals))
+			part, err := ParseString(expr[i:], boundVars, globals)
 			i = len(expr)
+
+			if err != nil {
+				return term, err
+			}
+
+			term = term.Append(part)
 
 		case '(':
 			var cterm interface{}
@@ -119,13 +130,11 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 		}
 	}
 
-	// Simplify functions
-	if term.Len() <= 1 {
-		if term.Len() == 0 {
-			return term, errors.New("No function body present")
+	// Simplify function
+	if reflect.TypeOf(term).String() == "LamCalc.LamFunc" && term.Len() == 1 {
+		if reflect.TypeOf(term.Index(0)).String() == "LamCalc.LamExpr" {
+			return LamFunc(term.Index(0).(LamExpr)), nil
 		}
-
-		term = term.Index(0).(LamTerm)
 	}
 
 	return term, nil
