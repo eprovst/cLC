@@ -33,7 +33,12 @@ func executeStatement(stmnt cLCStatement) {
 
 	case "let":
 		// TODO: Is there an elegant way to stop computation?
-		globals[stmnt.parameters[0].(string)] = stmnt.parameters[0].(LamCalc.LamTerm).Expand()
+		fmt.Print("\n" + stmnt.parameters[0].(string) + " =\n\n")
+
+		lf := stmnt.parameters[1].(LamCalc.LamTerm).Expand()
+		globals[stmnt.parameters[0].(string)] = lf
+
+		fmt.Print("    " + lf.String() + "\n\n")
 
 	case "show":
 		// TODO: Is there an elegant way to stop computation?
