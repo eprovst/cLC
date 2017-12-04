@@ -17,8 +17,6 @@ type LamTerm interface {
 	deDeBruijn(boundLetters []string, nextletter int) string
 
 	// Lambda expand
-	Substitute(int, LamTerm) LamTerm
-	ExpandOnce() LamTerm
 	Expand() LamFunc
 }
 

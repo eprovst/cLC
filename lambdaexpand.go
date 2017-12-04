@@ -3,28 +3,9 @@ package LamCalc
 import "reflect"
 
 // Substitute replaces index by sub
-func (lf LamFunc) Substitute(index int, sub LamTerm) LamTerm {
-	return LamFunc(LamExpr(lf).Substitute(index, sub).(LamExpr))
-}
-
-// Insert places sub into the function whilst consuming the latter
-func (lf LamFunc) Insert(sub LamTerm) LamTerm {
-	return LamExpr(lf).Substitute(0, sub)
-}
-
-// ExpandOnce expands a lambda function (which means doing nothing)
-func (lf LamFunc) ExpandOnce() LamTerm {
-	return lf
-}
-
-// Expand expands a lambda function (which means doing nothing)
-func (lf LamFunc) Expand() LamFunc {
-	return lf
-}
-
-// Substitute fills replaces index by sub
-func (lx LamExpr) Substitute(index int, sub LamTerm) LamTerm {
+func (lx LamExpr) substitute(index int, sub LamTerm) LamExpr {
 	nw := LamExpr{}
+
 	for _, term := range lx {
 		switch term := term.(type) {
 		case int:
@@ -36,44 +17,60 @@ func (lx LamExpr) Substitute(index int, sub LamTerm) LamTerm {
 			}
 
 		case LamExpr:
-			nw = append(nw, term.Substitute(index, sub))
+			nw = append(nw, term.substitute(index, sub))
 
 		case LamFunc:
-			nw = append(nw, term.Substitute(index+1, sub))
-
+			nw = append(nw, term.substitute(index+1, sub))
 		}
 	}
 
 	return nw
 }
 
+// Substitute replaces index by sub
+func (lf LamFunc) substitute(index int, sub LamTerm) LamFunc {
+	return LamFunc(LamExpr(lf).substitute(index, sub))
+}
+
+// Insert replaces index 0 by sub and returns a LamExpr
+func (lf LamFunc) insert(sub LamTerm) LamExpr {
+	return LamExpr(lf).substitute(0, sub)
+}
+
+// Expand expands a lambda function (which means doing nothing)
+func (lf LamFunc) Expand() LamFunc {
+	return lf
+}
+
 // ExpandOnce expands a lambda expression once
-func (lx LamExpr) ExpandOnce() LamTerm {
+func (lx LamExpr) expandOnce() LamTerm {
 	nw := LamExpr{}
 
-	if reflect.TypeOf(lx[0]).String() == "LamCalc.LamFunc" {
-		if len(lx) < 2 {
-			return lx[0].(LamFunc)
+	if len(lx) == 1 {
+		return lx[0].(LamTerm)
 
-		} else if reflect.TypeOf(lx[0]).String() == "LamCalc.LamFunc" || reflect.TypeOf(lx[0]).String() == "LamCalc.LamFunc" {
-			nw = append(nw, lx[0].(LamFunc).Insert(lx[1].(LamTerm)))
+	} else if len(lx) >= 2 && reflect.TypeOf(lx[0]).String() == "LamCalc.LamFunc" &&
+		reflect.TypeOf(lx[1]).String() == "LamCalc.LamFunc" {
 
-			if len(lx) > 2 {
-				nw = append(nw, lx[2:]...)
-			}
+		nw = append(nw, lx[0].(LamFunc).insert(lx[1].(LamFunc)))
 
-			return nw.ExpandOnce()
+		if len(lx) > 2 {
+			nw = append(nw, lx[2:]...)
 		}
 
-	} else {
-		for _, term := range lx {
-			switch term := term.(type) {
-			case int:
-				nw = append(nw, term)
+		return nw
+	}
 
-			case LamTerm:
-				nw = append(nw, term.ExpandOnce())
-			}
+	for _, term := range lx {
+		switch term := term.(type) {
+		case int:
+			nw = append(nw, term)
+
+		case LamFunc:
+			nw = append(nw, term)
+
+		case LamExpr:
+			nw = append(nw, term.expandOnce())
 		}
 	}
 
@@ -82,10 +79,10 @@ func (lx LamExpr) ExpandOnce() LamTerm {
 
 // Expand expands a lambda expression
 func (lx LamExpr) Expand() LamFunc {
-	nw := lx.ExpandOnce()
+	nw := lx.expandOnce()
 
 	for reflect.TypeOf(nw).String() != "LamCalc.LamFunc" {
-		nw = nw.ExpandOnce()
+		nw = nw.(LamExpr).expandOnce()
 	}
 
 	return nw.(LamFunc)

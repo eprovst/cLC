@@ -8,18 +8,18 @@ import (
 func intToLetter(num int) string {
 	if num < 3 {
 		// x, y, z
-		return string(rune(120 + num))
+		return string(rune(120 + num - 0))
 
 	} else if num < 6 {
 		// u, v, w
-		return string(rune(117 - 3 + num))
+		return string(rune(117 + num - 3))
 
 	} else if num < 26 {
 		// a, b, c...
-		return string(rune(num - 6 + 97))
+		return string(rune(97 + num - 6))
 	}
 
-	// X1, x2, x3...
+	// x1, x2, x3...
 	return "x" + strconv.Itoa(num-25)
 }
 
@@ -52,11 +52,11 @@ func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter int) string {
 			if len(lx) == 1 {
 				result += part.deDeBruijn(boundLetters, nextletter)
 			} else {
-				result = strings.TrimSuffix(result, " ") + "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
+				result = strings.TrimSuffix(result, " ") + "(" + part.deDeBruijn(boundLetters, nextletter) + ")"
 			}
 
 		case LamExpr:
-			result = strings.TrimSuffix(result, " ") + "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
+			result = strings.TrimSuffix(result, " ") + "(" + part.deDeBruijn(boundLetters, nextletter) + ")"
 
 		default:
 			panic("invalid type in LamExpr")
