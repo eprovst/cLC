@@ -49,7 +49,7 @@ func (lx LamExpr) expandOnce() LamTerm {
 	if len(lx) == 1 {
 		return lx[0].(LamTerm)
 
-	} else if len(lx) >= 2 && reflect.TypeOf(lx[0]).String() == "LamCalc.LamFunc" &&
+	} else if reflect.TypeOf(lx[0]).String() == "LamCalc.LamFunc" &&
 		reflect.TypeOf(lx[1]).String() == "LamCalc.LamFunc" {
 
 		nw = append(nw, lx[0].(LamFunc).insert(lx[1].(LamFunc)))

@@ -40,6 +40,17 @@ func executeStatement(stmnt cLCStatement) {
 
 		fmt.Print("    " + lf.String() + "\n\n")
 
+	case "fold":
+		// TODO: Is there an elegant way to stop computation?
+		expression := stmnt.parameters[0].(LamCalc.LamTerm).Expand()
+		fmt.Print("\n" + expression.String() + " =\n\n")
+
+		for _, term := range stmnt.parameters[1].([]string) {
+			if globals[term].Equals(expression) {
+				fmt.Print("    " + term + "\n\n")
+			}
+		}
+
 	case "show":
 		// TODO: Is there an elegant way to stop computation?
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n\n")

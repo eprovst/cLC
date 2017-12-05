@@ -3,12 +3,17 @@ package LamCalc
 import (
 	"errors"
 	"reflect"
+	"strings"
 )
 
 // TODO: Improve accuracy of error messages.
 
 // ParseString turns the input into a LamTerm
-func ParseString(expr string, boundVars map[string]int, globals map[string]LamFunc) (LamTerm, error) {
+func ParseString(expr string, globals map[string]LamFunc) (LamTerm, error) {
+	return furtherParseString(strings.TrimSpace(expr), map[string]int{}, globals)
+}
+
+func furtherParseString(expr string, boundVars map[string]int, globals map[string]LamFunc) (LamTerm, error) {
 	var term LamTerm
 
 	i := 0
@@ -34,7 +39,9 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 		fvar := ""
 
 		for ; i < len(expr) && expr[i] != '.'; i++ {
-			fvar += string(expr[i])
+			if expr[i] != ' ' {
+				fvar += string(expr[i])
+			}
 		}
 
 		if i == len(expr) {
@@ -54,7 +61,7 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 		switch expr[i] {
 		case 'L':
 			// Start of function, the rest of the expression is part of it
-			part, err := ParseString(expr[i:], boundVars, globals)
+			part, err := furtherParseString(expr[i:], boundVars, globals)
 			i = len(expr)
 
 			if err != nil {
@@ -82,7 +89,7 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 				}
 			} // After this loop i points at the closing bracket
 
-			cterm, err := ParseString(expr[starte:i], boundVars, globals)
+			cterm, err := furtherParseString(expr[starte:i], boundVars, globals)
 
 			if err != nil {
 				return term, err
@@ -131,10 +138,16 @@ func ParseString(expr string, boundVars map[string]int, globals map[string]LamFu
 	}
 
 	// Simplify function
-	if reflect.TypeOf(term).String() == "LamCalc.LamFunc" && term.Len() == 1 {
-		if reflect.TypeOf(term.Index(0)).String() == "LamCalc.LamExpr" {
-			return LamFunc(term.Index(0).(LamExpr)), nil
+	if reflect.TypeOf(term).String() == "LamCalc.LamFunc" &&
+		reflect.TypeOf(term.Index(0)).String() == "LamCalc.LamExpr" {
+
+		res := LamFunc(term.(LamFunc)[0].(LamExpr))
+
+		if len(term.(LamFunc)) > 1 {
+			res = append(res, term.(LamFunc)[1:]...)
 		}
+
+		return res, nil
 	}
 
 	return term, nil

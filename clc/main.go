@@ -1,12 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/ElecProg/LamCalc"
+	"github.com/chzyer/readline"
 )
 
 var globals = map[string]LamCalc.LamFunc{}
@@ -58,28 +57,26 @@ func main() {
 
 	globals["I"] = LamCalc.LamFunc{0}
 
-	//
 	if len(os.Args) > 1 {
 		file, err := os.Open(os.Args[1])
 
 		if err != nil {
-			fmt.Println("Error:")
-			fmt.Println("> " + err.Error())
+			fmt.Println("Error: " + err.Error())
 			fmt.Print("Switching to interactive mode...\n\n")
+
 		} else {
 			file.Close()
-			fmt.Println("File execution not yet supported...")
-			os.Exit(0)
+			fmt.Println("Error: File execution not yet supported...")
+			fmt.Print("Switching to interactive mode...\n\n")
+			// TODO: Support executing files.
 		}
 	}
 
-	commandline := bufio.NewReader(os.Stdin)
+	commandline, _ := readline.New("(cLC) ")
+	defer commandline.Close()
 
 	for {
-		fmt.Print("(cLC) ")
-		command, _ := commandline.ReadString('\n')
-		command = strings.TrimSpace(command)
-
+		command, _ := commandline.Readline()
 		stmnt, err := parseStatement(command)
 
 		if err != nil {
