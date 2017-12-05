@@ -16,6 +16,8 @@ type cLCStatement struct {
 
 func executeStatement(stmnt cLCStatement) {
 	switch stmnt.command {
+	case "none":
+		// Nothing to do
 	case "exit":
 		os.Exit(0)
 
@@ -30,6 +32,22 @@ func executeStatement(stmnt cLCStatement) {
 
 		clearCmd.Stdout = os.Stdout
 		clearCmd.Run()
+
+	case "info":
+		fmt.Print(`      _      ___
+  __   \    /
+ /     /\  (
+ \__  /  \  \___
+
+cLamCalc
+--------
+
+commandline Lambda Calculator
+
+Copyright (c) 2017 Evert Provoost.
+All Rights Reserved.
+
+`)
 
 	case "let":
 		// TODO: Is there an elegant way to stop computation?

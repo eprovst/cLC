@@ -10,6 +10,10 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 	// Some clean up
 	stmnt = strings.TrimSpace(stmnt)
 
+	if len(stmnt) == 0 {
+		return cLCStatement{command: "none"}, nil
+	}
+
 	// TODO: Add let
 	switch strings.Fields(stmnt)[0] {
 	case "exit":
@@ -17,6 +21,9 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 	case "clear":
 		return cLCStatement{command: "clear"}, nil
+
+	case "info":
+		return cLCStatement{command: "info"}, nil
 
 	case "let":
 		// TODO: Make more robust

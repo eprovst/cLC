@@ -12,6 +12,7 @@ var globals = map[string]LamCalc.LamFunc{}
 
 func main() {
 	// Prepare some basic combinators
+	// Y combinator
 	globals["Y"] = LamCalc.LamFunc{
 		0,
 		LamCalc.LamFunc{
@@ -30,6 +31,7 @@ func main() {
 		},
 	}
 
+	// S, K and I calculus
 	globals["S"] = LamCalc.LamFunc{
 		LamCalc.LamFunc{
 			LamCalc.LamFunc{
@@ -55,7 +57,16 @@ func main() {
 		},
 	}
 
-	globals["I"] = LamCalc.LamFunc{0}
+	globals["I"] = LamCalc.LamFunc{
+		0,
+	}
+
+	// Iota
+	globals["i"] = LamCalc.LamFunc{
+		0,
+		globals["S"],
+		globals["K"],
+	}
 
 	if len(os.Args) > 1 {
 		file, err := os.Open(os.Args[1])
@@ -74,6 +85,9 @@ func main() {
 
 	commandline, _ := readline.New("(cLC) ")
 	defer commandline.Close()
+
+	// Show info
+	executeStatement(cLCStatement{command: "info"})
 
 	for {
 		command, _ := commandline.Readline()
