@@ -18,6 +18,8 @@ type LamTerm interface {
 
 	// Lambda expand
 	Expand() LamFunc
+	expandOnce() LamTerm
+	simplify() LamTerm
 }
 
 // LamExpr is a list of lamfuncs, lamexprns and De Bruijn indexes (all lowered by one) which isn't a function itself.

@@ -1,5 +1,4 @@
--- The expansion algorithm has to be heavily extended
--- to make this work...
+-- The expansion algorithm doesn't seem to work for some of these...
 
 -- First we define functions on Church numerals
 let plus  = Lm.Ln.Lf.Lx.m f(n f x)
