@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 
@@ -14,31 +13,7 @@ var globals = map[string]LamCalc.LamFunc{}
 func main() {
 	// Load files
 	if len(os.Args) > 1 {
-		for _, filePath := range os.Args[1:] {
-			file, err := os.Open(filePath)
-
-			if err != nil {
-				fmt.Println("Error: " + err.Error())
-
-			} else {
-				fileScanner := bufio.NewScanner(file)
-
-				for fileScanner.Scan() {
-					command := fileScanner.Text()
-					stmnt, err := parseStatement(command)
-
-					if err != nil {
-						fmt.Println("Error: " + err.Error())
-					} else {
-						executeStatement(stmnt)
-					}
-				}
-
-				file.Close()
-				fmt.Println("Done loading '" + filePath + "'.")
-			}
-		}
-
+		loadFiles(os.Args[1:])
 		fmt.Print("Switching to interactive mode...\n\n")
 	}
 

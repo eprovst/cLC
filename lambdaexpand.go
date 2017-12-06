@@ -4,6 +4,8 @@ import (
 	"reflect"
 )
 
+// TODO: Be able to expand more...
+
 // Substitute replaces index by sub
 func (lx LamExpr) substitute(index int, sub LamTerm) LamExpr {
 	nw := LamExpr{}

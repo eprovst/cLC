@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/ElecProg/LamCalc"
@@ -15,7 +16,6 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		return cLCStatement{command: "none"}, nil
 	}
 
-	// TODO: Add let
 	switch strings.Fields(stmnt)[0] {
 	case "exit":
 		return cLCStatement{command: "exit"}, nil
@@ -55,6 +55,18 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 			command:    "fold",
 			parameters: []interface{}{expression, vars},
 		}, nil
+
+	case "load":
+		fields := strings.Fields(stmnt)
+
+		if len(fields) > 1 {
+			return cLCStatement{
+				command:    "load",
+				parameters: []interface{}{fields[1:]},
+			}, nil
+		}
+
+		return cLCStatement{}, errors.New("no files listed to load")
 
 	default:
 		expression, err := LamCalc.ParseString(stmnt, globals)

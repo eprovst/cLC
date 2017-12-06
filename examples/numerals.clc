@@ -1,0 +1,29 @@
+-- The expansion algorithm has to be heavily extended
+-- to make this work...
+
+-- First we define functions on Church numerals
+let plus  = Lm.Ln.Lf.Lx.m f(n f x)
+let succ  = Ln.Lf.Lx.f(n f x)
+let mult  = Lm.Ln.Lf.m(n f)
+let exp   = Lm.Ln.n m
+let pred  = Ln.Lf.Lx.n(Lg.Lh.h(g f))(Lu.x)(Lu.u)
+let minus = Lm.Ln.(n pred)m
+
+-- Now we define all numbers from 0 to 16...
+let 0  = Lf.Lx.x
+let 1  = succ 0
+let 2  = succ 1
+let 3  = succ 2
+let 4  = succ 3
+let 5  = succ 4
+let 6  = succ 5
+let 7  = succ 6
+let 8  = succ 7
+let 9  = succ 8
+let 10 = succ 9
+let 11 = succ 10
+let 12 = succ 11
+let 13 = succ 12
+let 14 = succ 13
+let 15 = succ 14
+let 16 = succ 15
