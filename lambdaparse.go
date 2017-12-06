@@ -2,7 +2,6 @@ package LamCalc
 
 import (
 	"errors"
-	"reflect"
 	"strings"
 )
 
@@ -95,11 +94,6 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 				return term, err
 			}
 
-			// Simplify expressions
-			if reflect.TypeOf(cterm).String() == "LamCalc.LamExpr" && cterm.(LamExpr).Len() == 1 {
-				cterm = cterm.(LamExpr).Index(0)
-			}
-
 			term = term.Append(cterm)
 
 		case ' ':
@@ -135,19 +129,6 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 				}
 			}
 		}
-	}
-
-	// Simplify function
-	if reflect.TypeOf(term).String() == "LamCalc.LamFunc" &&
-		reflect.TypeOf(term.Index(0)).String() == "LamCalc.LamExpr" {
-
-		res := LamFunc(term.(LamFunc)[0].(LamExpr))
-
-		if len(term.(LamFunc)) > 1 {
-			res = append(res, term.(LamFunc)[1:]...)
-		}
-
-		return res, nil
 	}
 
 	return term, nil
