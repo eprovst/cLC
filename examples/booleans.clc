@@ -1,0 +1,8 @@
+let T   = Lx.Ly.x
+let F   = Lx.Ly.y
+
+let NOT = Lx.x F T
+
+let AND = Lx.Ly.x y F
+let OR  = Lx.Ly.x T y
+let XOR = Lx.Ly.x (y F T) y

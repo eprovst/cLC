@@ -1,6 +1,8 @@
 package LamCalc
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // Substitute replaces index by sub
 func (lx LamExpr) substitute(index int, sub LamTerm) LamExpr {

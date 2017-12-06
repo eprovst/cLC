@@ -10,7 +10,8 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 	// Some clean up
 	stmnt = strings.TrimSpace(stmnt)
 
-	if len(stmnt) == 0 {
+	if len(stmnt) == 0 || strings.HasPrefix(stmnt, "--") {
+		// Empty line or comment
 		return cLCStatement{command: "none"}, nil
 	}
 

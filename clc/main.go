@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 
@@ -11,76 +12,34 @@ import (
 var globals = map[string]LamCalc.LamFunc{}
 
 func main() {
-	// Prepare some basic combinators
-	// Y combinator
-	globals["Y"] = LamCalc.LamFunc{
-		0,
-		LamCalc.LamFunc{
-			1,
-			LamCalc.LamExpr{
-				0,
-				0,
-			},
-		},
-		LamCalc.LamFunc{
-			1,
-			LamCalc.LamExpr{
-				0,
-				0,
-			},
-		},
-	}
-
-	// S, K and I calculus
-	globals["S"] = LamCalc.LamFunc{
-		LamCalc.LamFunc{
-			LamCalc.LamFunc{
-				2,
-				0,
-				LamCalc.LamExpr{
-					1,
-					0,
-				},
-			},
-		},
-	}
-
-	globals["K"] = LamCalc.LamFunc{
-		LamCalc.LamFunc{
-			1,
-		},
-	}
-
-	globals["K*"] = LamCalc.LamFunc{
-		LamCalc.LamFunc{
-			0,
-		},
-	}
-
-	globals["I"] = LamCalc.LamFunc{
-		0,
-	}
-
-	// Iota
-	globals["i"] = LamCalc.LamFunc{
-		0,
-		globals["S"],
-		globals["K"],
-	}
-
+	// Load files
 	if len(os.Args) > 1 {
-		file, err := os.Open(os.Args[1])
+		for _, filePath := range os.Args[1:] {
+			file, err := os.Open(filePath)
 
-		if err != nil {
-			fmt.Println("Error: " + err.Error())
-			fmt.Print("Switching to interactive mode...\n\n")
+			if err != nil {
+				fmt.Println("Error: " + err.Error())
 
-		} else {
-			file.Close()
-			fmt.Println("Error: File execution not yet supported...")
-			fmt.Print("Switching to interactive mode...\n\n")
-			// TODO: Support executing files.
+			} else {
+				fileScanner := bufio.NewScanner(file)
+
+				for fileScanner.Scan() {
+					command := fileScanner.Text()
+					stmnt, err := parseStatement(command)
+
+					if err != nil {
+						fmt.Println("Error: " + err.Error())
+					} else {
+						executeStatement(stmnt)
+					}
+				}
+
+				file.Close()
+				fmt.Println("Done loading '" + filePath + "'.")
+			}
 		}
+
+		fmt.Print("Switching to interactive mode...\n\n")
 	}
 
 	commandline, _ := readline.New("(cLC) ")

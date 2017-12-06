@@ -1,0 +1,4 @@
+let S  = Lx.Ly.Lz.x z(y z)
+let K  = Lx.Ly.x
+let K* = Lx.Ly.y
+let I  = Lx.x

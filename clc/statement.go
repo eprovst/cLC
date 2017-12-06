@@ -51,12 +51,14 @@ All Rights Reserved.
 
 	case "let":
 		// TODO: Is there an elegant way to stop computation?
-		fmt.Print("\n" + stmnt.parameters[0].(string) + " =\n\n")
+
+		// NOTE: Printing is currently disabled, is this the way to go?
+		//fmt.Print("\n" + stmnt.parameters[0].(string) + " =\n\n")
 
 		lf := stmnt.parameters[1].(LamCalc.LamTerm).Expand()
 		globals[stmnt.parameters[0].(string)] = lf
 
-		fmt.Print("    " + lf.String() + "\n\n")
+		//fmt.Print("    " + lf.String() + "\n\n")
 
 	case "fold":
 		// TODO: Is there an elegant way to stop computation?
