@@ -19,7 +19,7 @@ func heightenIndex(cutoff int, expr interface{}) interface{} {
 		res := LamFunc{}
 
 		for _, term := range expr {
-			res = append(res, lowerIndex(cutoff+1, term))
+			res = append(res, heightenIndex(cutoff+1, term))
 		}
 
 		return res
@@ -179,17 +179,18 @@ func (lx LamExpr) simplify() LamTerm {
 
 	for _, term := range lx {
 		switch term := term.(type) {
-		case LamExpr:
-			simpl := term.simplify().(LamExpr)
+		case LamTerm:
+			switch simpl := term.simplify().(type) {
+			case LamExpr:
+				if len(simpl) == 1 {
+					res = append(res, simpl[0])
+				} else {
+					res = append(res, simpl)
+				}
 
-			if len(simpl) == 1 {
-				res = append(res, simpl[0])
-			} else {
+			case LamFunc:
 				res = append(res, simpl)
 			}
-
-		case LamFunc:
-			res = append(res, term.simplify().(LamFunc))
 
 		default:
 			res = append(res, term)
