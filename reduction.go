@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-// reduceOnce expands a lambda expression once
+// reduceOnce reduces a lambda expression once
 func (lx LamExpr) reduceOnce() LamTerm {
 	nw := LamExpr{}
 
@@ -45,7 +45,7 @@ func (lx LamExpr) Reduce() LamFunc {
 		nw = nw.reduceOnce().simplify()
 	}
 
-	return nw.(LamFunc)
+	return nw.(LamFunc).etaReduce().simplify().(LamFunc)
 }
 
 // Reduce reduces a lambda function
@@ -58,5 +58,5 @@ func (lf LamFunc) Reduce() LamFunc {
 		nw = nw.reduceOnce().simplify()
 	}
 
-	return nw.(LamFunc)
+	return nw.(LamFunc).etaReduce().simplify().(LamFunc)
 }
