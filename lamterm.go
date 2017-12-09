@@ -21,8 +21,8 @@ type LamTerm interface {
 	simplify() LamTerm
 
 	// reduction.go
-	Reduce() LamFunc
-	HNFReduce() LamFunc
+	Reduce() (LamFunc, error)
+	WHNFReduce() (LamFunc, error)
 	reduceOnce() LamTerm
 }
 

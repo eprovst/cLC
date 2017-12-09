@@ -1,2 +1,2 @@
 -- The famous Y combinator
-hlet Y = \f.(\x.f (x x)) (\x.f (x x))
+wlet Y = \f.(\x.f (x x)) (\x.f (x x))

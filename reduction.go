@@ -1,8 +1,12 @@
 package LamCalc
 
 import (
+	"errors"
 	"reflect"
 )
+
+// MaxReductions determines the maximum amount of expansions before we give up
+var MaxReductions = 10000
 
 // reduceOnce reduces a lambda expression once
 func (lx LamExpr) reduceOnce() LamTerm {
@@ -36,44 +40,56 @@ func (lf LamFunc) reduceOnce() LamTerm {
 }
 
 // Reduce reduces a lambda expression
-func (lx LamExpr) Reduce() LamFunc {
+func (lx LamExpr) Reduce() (LamFunc, error) {
 	ls := lx.simplify()
 	nw := ls.reduceOnce().simplify()
 
-	for !nw.alphaEquivalent(ls) {
+	for c := 0; !nw.alphaEquivalent(ls); c++ {
+		if c == MaxReductions {
+			return LamFunc{}, errors.New("exeeded maximum amount of reductions")
+		}
+
 		ls = nw
 		nw = nw.reduceOnce().simplify()
 	}
 
-	return nw.(LamFunc).etaReduce().simplify().(LamFunc)
+	return nw.(LamFunc).etaReduce().simplify().(LamFunc), nil
 }
 
 // Reduce reduces a lambda function
-func (lf LamFunc) Reduce() LamFunc {
+func (lf LamFunc) Reduce() (LamFunc, error) {
 	ls := lf.simplify()
 	nw := ls.reduceOnce().simplify()
 
-	for !nw.alphaEquivalent(ls) {
+	for c := 0; !nw.alphaEquivalent(ls); c++ {
+		if c == MaxReductions {
+			return LamFunc{}, errors.New("exeeded maximum amount of reductions")
+		}
+
 		ls = nw
 		nw = nw.reduceOnce().simplify()
 	}
 
-	return nw.(LamFunc).etaReduce().simplify().(LamFunc)
+	return nw.(LamFunc).etaReduce().simplify().(LamFunc), nil
 }
 
-// HNFReduce reduces the expression till a head normal form is found (eta reduction isn't tried)
-func (lx LamExpr) HNFReduce() LamFunc {
+// WHNFReduce reduces the expression till a weak head normal form is found (eta reduction isn't tried)
+func (lx LamExpr) WHNFReduce() (LamFunc, error) {
 	nw := lx.reduceOnce().simplify()
 
-	for reflect.TypeOf(nw).String() != "LamCalc.LamFunc" {
+	for c := 0; reflect.TypeOf(nw).String() != "LamCalc.LamFunc"; c++ {
+		if c == MaxReductions {
+			return LamFunc{}, errors.New("exeeded maximum amount of reductions")
+		}
+
 		nw = nw.reduceOnce().simplify()
 	}
 
-	return nw.(LamFunc)
+	return nw.(LamFunc), nil
 }
 
-// HNFReduce reduces the function till a head normal form is found (eta reduction isn't tried)
+// WHNFReduce reduces the function till a weak head normal form is found (eta reduction isn't tried)
 // ie. doesn't do anything...
-func (lf LamFunc) HNFReduce() LamFunc {
-	return lf
+func (lf LamFunc) WHNFReduce() (LamFunc, error) {
+	return lf, nil
 }

@@ -37,20 +37,34 @@ func executeStatement(stmnt cLCStatement) {
 		showInfo()
 
 	case "let":
-		// TODO: Is there an elegant way to stop computation?
-		lf := stmnt.parameters[1].(LamCalc.LamTerm).Reduce()
+		lf, err := stmnt.parameters[1].(LamCalc.LamTerm).Reduce()
+
+		if err != nil {
+			printError(err)
+			return
+		}
+
 		globals[stmnt.parameters[0].(string)] = lf
 
-	case "hlet":
-		// TODO: Is there an elegant way to stop computation?
-		lf := stmnt.parameters[1].(LamCalc.LamTerm).HNFReduce()
+	case "wlet":
+		lf, err := stmnt.parameters[1].(LamCalc.LamTerm).WHNFReduce()
+
+		if err != nil {
+			printError(err)
+			return
+		}
+
 		globals[stmnt.parameters[0].(string)] = lf
 
 	case "fold":
-		// TODO: Is there an elegant way to stop computation?
-		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n")
+		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()
 
-		expression := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()
+		if err != nil {
+			printError(err)
+			return
+		}
+
+		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n")
 
 		couldFold := false
 		for _, term := range stmnt.parameters[1].([]string) {
@@ -69,14 +83,26 @@ func executeStatement(stmnt cLCStatement) {
 	case "load":
 		loadFiles(stmnt.parameters[0].([]string))
 
-	case "hnf":
-		// TODO: Is there an elegant way to stop computation?
+	case "weak":
+		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).WHNFReduce()
+
+		if err != nil {
+			printError(err)
+			return
+		}
+
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n\n")
-		fmt.Print("    " + stmnt.parameters[0].(LamCalc.LamTerm).HNFReduce().String() + "\n\n")
+		fmt.Print("    " + expression.String() + "\n\n")
 
 	case "show":
-		// TODO: Is there an elegant way to stop computation?
+		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()
+
+		if err != nil {
+			printError(err)
+			return
+		}
+
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n\n")
-		fmt.Print("    " + stmnt.parameters[0].(LamCalc.LamTerm).Reduce().String() + "\n\n")
+		fmt.Print("    " + expression.String() + "\n\n")
 	}
 }

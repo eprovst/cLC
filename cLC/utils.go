@@ -6,12 +6,16 @@ import (
 	"os"
 )
 
+func printError(err error) {
+	fmt.Println("Error: " + err.Error())
+}
+
 func loadFiles(paths []string) {
 	for _, filePath := range paths {
 		file, err := os.Open(filePath)
 
 		if err != nil {
-			fmt.Println("Error: " + err.Error())
+			printError(err)
 
 		} else {
 			fileScanner := bufio.NewScanner(file)
@@ -21,7 +25,7 @@ func loadFiles(paths []string) {
 				stmnt, err := parseStatement(command)
 
 				if err != nil {
-					fmt.Println("Error: " + err.Error())
+					printError(err)
 				} else {
 					executeStatement(stmnt)
 				}

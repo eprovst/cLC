@@ -14,6 +14,9 @@ func main() {
 	// A warm welcome
 	showInfo()
 
+	// Limited the amount of time we wait for computation to finish
+	LamCalc.MaxReductions = 2500
+
 	// Load files
 	if len(os.Args) > 1 {
 		loadFiles(os.Args[1:])
@@ -28,7 +31,7 @@ func main() {
 		stmnt, err := parseStatement(command)
 
 		if err != nil {
-			fmt.Println("Error: " + err.Error())
+			printError(err)
 		} else {
 			executeStatement(stmnt)
 		}

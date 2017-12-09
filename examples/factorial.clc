@@ -2,4 +2,4 @@
 load comparing.clc Y.clc
 
 let  hfac = \f.\n.if (LEQ n 1) 1 (mult n (f (minus n 1)))
-hlet fac  = Y hfac
+wlet fac  = Y hfac

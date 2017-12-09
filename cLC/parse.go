@@ -41,9 +41,9 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 			parameters: []interface{}{varname, expression},
 		}, nil
 
-	case "hlet":
+	case "wlet":
 		// TODO: Make more robust
-		stmnt = strings.TrimPrefix(stmnt, "hlet")
+		stmnt = strings.TrimPrefix(stmnt, "wlet")
 		varname := strings.TrimSpace(strings.TrimSuffix(strings.SplitAfter(stmnt, "=")[0], "="))
 		expression, err := LamCalc.ParseString(strings.SplitAfter(stmnt, "=")[1], globals)
 
@@ -52,7 +52,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		}
 
 		return cLCStatement{
-			command:    "hlet",
+			command:    "wlet",
 			parameters: []interface{}{varname, expression},
 		}, nil
 
@@ -83,8 +83,8 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 		return cLCStatement{}, errors.New("no files listed to load")
 
-	case "hnf":
-		stmnt = strings.TrimPrefix(stmnt, "hnf")
+	case "weak":
+		stmnt = strings.TrimPrefix(stmnt, "weak")
 		expression, err := LamCalc.ParseString(stmnt, globals)
 
 		if err != nil {
@@ -92,7 +92,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		}
 
 		return cLCStatement{
-			command:    "hnf",
+			command:    "weak",
 			parameters: []interface{}{expression},
 		}, nil
 
