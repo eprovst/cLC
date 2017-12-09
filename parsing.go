@@ -19,7 +19,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 
 	if expr[i] == '\\' {
 		if len(expr) < 3 {
-			return term, errors.New("No local variable specified in function")
+			return term, errors.New("no local variable specified in function")
 		}
 
 		i++
@@ -44,7 +44,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 		}
 
 		if i == len(expr) {
-			return term, errors.New("Function body not started")
+			return term, errors.New("function body not started")
 		}
 
 		i++ // Skip the .
