@@ -41,6 +41,21 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 			parameters: []interface{}{varname, expression},
 		}, nil
 
+	case "hlet":
+		// TODO: Make more robust
+		stmnt = strings.TrimPrefix(stmnt, "hlet")
+		varname := strings.TrimSpace(strings.TrimSuffix(strings.SplitAfter(stmnt, "=")[0], "="))
+		expression, err := LamCalc.ParseString(strings.SplitAfter(stmnt, "=")[1], globals)
+
+		if err != nil {
+			return cLCStatement{}, err
+		}
+
+		return cLCStatement{
+			command:    "hlet",
+			parameters: []interface{}{varname, expression},
+		}, nil
+
 	case "fold":
 		// TODO: Make more robust
 		stmnt = strings.TrimPrefix(stmnt, "fold")
@@ -67,6 +82,19 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		}
 
 		return cLCStatement{}, errors.New("no files listed to load")
+
+	case "hnf":
+		stmnt = strings.TrimPrefix(stmnt, "hnf")
+		expression, err := LamCalc.ParseString(stmnt, globals)
+
+		if err != nil {
+			return cLCStatement{}, err
+		}
+
+		return cLCStatement{
+			command:    "hnf",
+			parameters: []interface{}{expression},
+		}, nil
 
 	default:
 		expression, err := LamCalc.ParseString(stmnt, globals)

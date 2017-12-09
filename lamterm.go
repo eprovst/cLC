@@ -22,6 +22,7 @@ type LamTerm interface {
 
 	// reduction.go
 	Reduce() LamFunc
+	HNFReduce() LamFunc
 	reduceOnce() LamTerm
 }
 

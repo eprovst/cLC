@@ -1,5 +1,2 @@
--- This results in an infinite loop, when used on anything...
--- If you have a hint on how we could change the expansion algorithm
--- to work please let me know...
-
-let Y = \f.(\x.f (x x)) (\x.f (x x))
+-- The famous Y combinator
+hlet Y = \f.(\x.f (x x)) (\x.f (x x))

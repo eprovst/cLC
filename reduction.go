@@ -60,3 +60,20 @@ func (lf LamFunc) Reduce() LamFunc {
 
 	return nw.(LamFunc).etaReduce().simplify().(LamFunc)
 }
+
+// HNFReduce reduces the expression till a head normal form is found (eta reduction isn't tried)
+func (lx LamExpr) HNFReduce() LamFunc {
+	nw := lx.reduceOnce().simplify()
+
+	for reflect.TypeOf(nw).String() != "LamCalc.LamFunc" {
+		nw = nw.reduceOnce().simplify()
+	}
+
+	return nw.(LamFunc)
+}
+
+// HNFReduce reduces the function till a head normal form is found (eta reduction isn't tried)
+// ie. doesn't do anything...
+func (lf LamFunc) HNFReduce() LamFunc {
+	return lf
+}

@@ -41,6 +41,11 @@ func executeStatement(stmnt cLCStatement) {
 		lf := stmnt.parameters[1].(LamCalc.LamTerm).Reduce()
 		globals[stmnt.parameters[0].(string)] = lf
 
+	case "hlet":
+		// TODO: Is there an elegant way to stop computation?
+		lf := stmnt.parameters[1].(LamCalc.LamTerm).HNFReduce()
+		globals[stmnt.parameters[0].(string)] = lf
+
 	case "fold":
 		// TODO: Is there an elegant way to stop computation?
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n")
@@ -63,6 +68,11 @@ func executeStatement(stmnt cLCStatement) {
 
 	case "load":
 		loadFiles(stmnt.parameters[0].([]string))
+
+	case "hnf":
+		// TODO: Is there an elegant way to stop computation?
+		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n\n")
+		fmt.Print("    " + stmnt.parameters[0].(LamCalc.LamTerm).HNFReduce().String() + "\n\n")
 
 	case "show":
 		// TODO: Is there an elegant way to stop computation?
