@@ -52,11 +52,11 @@ func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter int) string {
 			if len(lx) == 1 {
 				result += part.deDeBruijn(boundLetters, nextletter)
 			} else {
-				result = strings.TrimSuffix(result, " ") + "(" + part.deDeBruijn(boundLetters, nextletter) + ")"
+				result = result + "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
 			}
 
 		case LamExpr:
-			result = strings.TrimSuffix(result, " ") + "(" + part.deDeBruijn(boundLetters, nextletter) + ")"
+			result = result + "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
 
 		default:
 			panic("invalid type in LamExpr")
@@ -77,7 +77,7 @@ func (lf LamFunc) deDeBruijn(boundLetters []string, nextletter int) string {
 	nextletter++
 
 	boundLetters = append([]string{newLetter}, boundLetters...)
-	result := "L" + newLetter + "."
+	result := "\\" + newLetter + "."
 
 	lx := LamExpr(lf)
 	result += lx.deDeBruijn(boundLetters, nextletter)

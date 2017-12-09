@@ -2,4 +2,4 @@
 -- If you have a hint on how we could change the expansion algorithm
 -- to work please let me know...
 
-let Y = Lf.(Lx.f(x x))(Lx.f(x x))
+let Y = \f.(\x.f (x x)) (\x.f (x x))

@@ -1,0 +1,6 @@
+-- This builds upon numerals.clc and booleans.clc
+load numerals.clc booleans.clc
+
+let IsZero = \n.n (\x.false) true
+let LEQ    = \m.\n.IsZero (minus m n)
+let EQ     = \m.\n.and (LEQ m n) (LEQ n m)

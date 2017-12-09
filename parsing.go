@@ -17,7 +17,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 
 	i := 0
 
-	if expr[i] == 'L' {
+	if expr[i] == '\\' {
 		if len(expr) < 3 {
 			return term, errors.New("No local variable specified in function")
 		}
@@ -58,7 +58,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 
 	for ; i < len(expr); i++ {
 		switch expr[i] {
-		case 'L':
+		case '\\':
 			// Start of function, the rest of the expression is part of it
 			part, err := furtherParseString(expr[i:], boundVars, globals)
 			i = len(expr)

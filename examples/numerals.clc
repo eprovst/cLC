@@ -1,13 +1,13 @@
 -- First we define functions on Church numerals
-let plus  = Lm.Ln.Lf.Lx.m f(n f x)
-let succ  = Ln.Lf.Lx.f(n f x)
-let mult  = Lm.Ln.Lf.m(n f)
-let exp   = Lm.Ln.n m
-let pred  = Ln.Lf.Lx.n(Lg.Lh.h(g f))(Lu.x)(Lu.u)
-let minus = Lm.Ln.(n pred)m
+let plus  = \m.\n.\f.\x.m f (n f x)
+let succ  = \n.\f.\x.f (n f x)
+let mult  = \m.\n.\f.m (n f)
+let exp   = \m.\n.n m
+let pred  = \n.\f.\x.n (\g.\h.h (g f)) (\u.x) (\u.u)
+let minus = \m.\n.(n pred) m
 
 -- Now we define all numbers from 0 to 16...
-let 0  = Lf.Lx.x
+let 0  = \f.\x.x
 let 1  = succ 0
 let 2  = succ 1
 let 3  = succ 2

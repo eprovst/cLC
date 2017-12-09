@@ -1,11 +1,11 @@
 -- Chruch booleans
 
-let true   = Lx.Ly.x
-let false   = Lx.Ly.y
+let true   = \x.\y.x
+let false  = \x.\y.y
 
-let not = Lx.x false true
+let not = \x.x false true
 
-let and = La.Lb.a b false
-let or  = La.Lb.a true b
-let xor = La.Lb.a (not b) b
-let if  = Lp.Lthen.Lelse.p then else
+let and = \a.\b.a b false
+let or  = \a.\b.a true b
+let xor = \a.\b.a (not b) b
+let if  = \p.\then.\else.p then else

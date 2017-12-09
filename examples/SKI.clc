@@ -1,7 +1,7 @@
 -- The S K (I) calculus
 
-let S  = Lx.Ly.Lz.x z(y z)
-let K  = Lx.Ly.x
+let S  = \x.\y.\z.x z (y z)
+let K  = \x.\y.x
 
 let K* = S K
 let I  = S K K
