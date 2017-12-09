@@ -1,5 +1,3 @@
--- The expansion algorithm doesn't seem to work for some of these...
-
 -- First we define functions on Church numerals
 let plus  = Lm.Ln.Lf.Lx.m f(n f x)
 let succ  = Ln.Lf.Lx.f(n f x)

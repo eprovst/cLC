@@ -1,4 +1,8 @@
+-- The S K (I) calculus
+
 let S  = Lx.Ly.Lz.x z(y z)
 let K  = Lx.Ly.x
-let K* = Lx.Ly.y
-let I  = Lx.x
+
+let K* = S K
+let I  = S K K
+-- Note: the last K could be replaced with any lambda term

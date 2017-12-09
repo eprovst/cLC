@@ -11,6 +11,9 @@ import (
 var globals = map[string]LamCalc.LamFunc{}
 
 func main() {
+	// A warm welcome
+	showInfo()
+
 	// Load files
 	if len(os.Args) > 1 {
 		loadFiles(os.Args[1:])
@@ -19,9 +22,6 @@ func main() {
 
 	commandline, _ := readline.New("(cLC) ")
 	defer commandline.Close()
-
-	// Show info
-	executeStatement(cLCStatement{command: "info"})
 
 	for {
 		command, _ := commandline.Readline()

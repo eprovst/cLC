@@ -67,7 +67,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 				return term, err
 			}
 
-			term = term.Append(part)
+			term = term.append(part)
 
 		case '(':
 			var cterm interface{}
@@ -94,7 +94,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 				return term, err
 			}
 
-			term = term.Append(cterm)
+			term = term.append(cterm)
 
 		case ' ':
 			// Skip spaces
@@ -119,11 +119,11 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 			cindex, ok := boundVars[cvar]
 
 			if ok {
-				term = term.Append(cindex)
+				term = term.append(cindex)
 			} else {
 				cfnc, ok := globals[cvar]
 				if ok {
-					term = term.Append(cfnc)
+					term = term.append(cfnc)
 				} else {
 					return term, errors.New("'" + cvar + "' not yet defined")
 				}

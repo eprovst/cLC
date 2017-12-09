@@ -32,3 +32,20 @@ func loadFiles(paths []string) {
 		}
 	}
 }
+
+func showInfo() {
+	fmt.Print(`       _      ___
+   __   \    /
+  /     /\  (
+  \__  /  \  \___
+
+cLamCalc
+--------
+
+commandline Lambda Calculator
+
+Copyright (c) 2017 Evert Provoost.
+All Rights Reserved.
+
+`)
+}

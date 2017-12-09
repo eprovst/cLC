@@ -34,35 +34,22 @@ func executeStatement(stmnt cLCStatement) {
 		clearCmd.Run()
 
 	case "info":
-		fmt.Print(`      _      ___
-  __   \    /
- /     /\  (
- \__  /  \  \___
-
-cLamCalc
---------
-
-commandline Lambda Calculator
-
-Copyright (c) 2017 Evert Provoost.
-All Rights Reserved.
-
-`)
+		showInfo()
 
 	case "let":
 		// TODO: Is there an elegant way to stop computation?
-		lf := stmnt.parameters[1].(LamCalc.LamTerm).Expand()
+		lf := stmnt.parameters[1].(LamCalc.LamTerm).Reduce()
 		globals[stmnt.parameters[0].(string)] = lf
 
 	case "fold":
 		// TODO: Is there an elegant way to stop computation?
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n")
 
-		expression := stmnt.parameters[0].(LamCalc.LamTerm).Expand()
+		expression := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()
 
 		couldFold := false
 		for _, term := range stmnt.parameters[1].([]string) {
-			if globals[term].Equals(expression) {
+			if globals[term].Equivalent(expression) {
 				fmt.Print(expression.String() + " =\n\n")
 				fmt.Print("    " + term + "\n\n")
 				couldFold = true
@@ -80,6 +67,6 @@ All Rights Reserved.
 	case "show":
 		// TODO: Is there an elegant way to stop computation?
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n\n")
-		fmt.Print("    " + stmnt.parameters[0].(LamCalc.LamTerm).Expand().String() + "\n\n")
+		fmt.Print("    " + stmnt.parameters[0].(LamCalc.LamTerm).Reduce().String() + "\n\n")
 	}
 }
