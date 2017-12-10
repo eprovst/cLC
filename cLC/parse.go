@@ -8,11 +8,13 @@ import (
 )
 
 func parseStatement(stmnt string) (cLCStatement, error) {
-	// Some clean up
+	// Remove comments
+	stmnt = strings.SplitAfter(stmnt, "--")[0]
+	stmnt = strings.TrimSuffix(stmnt, "--")
 	stmnt = strings.TrimSpace(stmnt)
 
-	if len(stmnt) == 0 || strings.HasPrefix(stmnt, "--") {
-		// Empty line or comment
+	if len(stmnt) == 0 {
+		// Empty line
 		return cLCStatement{command: "none"}, nil
 	}
 
