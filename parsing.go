@@ -5,25 +5,29 @@ import (
 	"strings"
 )
 
-// TODO: Improve accuracy of error messages.
-
 // ParseString turns the input into a LamTerm
-func ParseString(expr string, globals map[string]LamFunc) (LamTerm, error) {
-	return furtherParseString(strings.TrimSpace(expr), map[string]int{}, globals)
+func ParseString(expr string, globals map[string]LamAbst) (LamTerm, error) {
+	expr = strings.TrimSpace(expr)
+
+	if len(expr) == 0 {
+		return LamExpr{}, errors.New("no expression present")
+	}
+
+	return furtherParseString(expr, map[string]int{}, globals)
 }
 
-func furtherParseString(expr string, boundVars map[string]int, globals map[string]LamFunc) (LamTerm, error) {
+func furtherParseString(expr string, boundVars map[string]int, globals map[string]LamAbst) (LamTerm, error) {
 	var term LamTerm
 
 	i := 0
 
 	if expr[i] == '\\' {
 		if len(expr) < 3 {
-			return term, errors.New("no local variable specified in function")
+			return term, errors.New("no local variable specified in abstraction")
 		}
 
 		i++
-		term = LamFunc{}
+		term = LamAbst{}
 
 		// Create copy of boundVars where every index is one higher
 		oldVars := boundVars
@@ -35,22 +39,22 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 		}
 
 		// Now get the name of the currently bound variable
-		fvar := ""
+		avar := ""
 
 		for ; i < len(expr) && expr[i] != '.'; i++ {
 			if expr[i] != ' ' {
-				fvar += string(expr[i])
+				avar += string(expr[i])
 			}
 		}
 
 		if i == len(expr) {
-			return term, errors.New("function body not started")
+			return term, errors.New("abstraction body not started")
 		}
 
 		i++ // Skip the .
 
-		// Add the function variable to the boundvars map
-		boundVars[fvar] = 0
+		// Add the abstraction variable to the boundvars map
+		boundVars[avar] = 0
 
 	} else {
 		term = LamExpr{}
@@ -59,7 +63,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 	for ; i < len(expr); i++ {
 		switch expr[i] {
 		case '\\':
-			// Start of function, the rest of the expression is part of it
+			// Start of abstraction, the rest of the expression is part of it
 			part, err := furtherParseString(expr[i:], boundVars, globals)
 			i = len(expr)
 

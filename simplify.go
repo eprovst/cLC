@@ -34,7 +34,7 @@ func (lx LamExpr) simplify() LamTerm {
 					res = append(res, simpl)
 				}
 
-			case LamFunc:
+			case LamAbst:
 				res = append(res, simpl)
 			}
 
@@ -47,14 +47,14 @@ func (lx LamExpr) simplify() LamTerm {
 }
 
 // Simplify (tries) to remove unnecessary brackets
-func (lf LamFunc) simplify() LamTerm {
+func (lf LamAbst) simplify() LamTerm {
 	simpl := LamExpr(lf).simplify()
 
 	switch simpl := simpl.(type) {
 	case LamExpr:
-		return LamFunc(simpl)
+		return LamAbst(simpl)
 
 	default:
-		return LamFunc{simpl.(LamFunc)}
+		return LamAbst{simpl.(LamAbst)}
 	}
 }

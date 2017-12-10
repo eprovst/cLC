@@ -10,8 +10,8 @@ func shiftIndex(correction int, cutoff int, expr interface{}) interface{} {
 
 		return expr
 
-	case LamFunc:
-		res := LamFunc{}
+	case LamAbst:
+		res := LamAbst{}
 
 		for _, term := range expr {
 			res = append(res, shiftIndex(correction, cutoff+1, term))

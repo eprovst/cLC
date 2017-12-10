@@ -48,7 +48,7 @@ func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter int) string {
 				result += newLetter + " "
 			}
 
-		case LamFunc:
+		case LamAbst:
 			if len(lx) == 1 {
 				result += part.deDeBruijn(boundLetters, nextletter)
 			} else {
@@ -66,12 +66,12 @@ func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter int) string {
 	return strings.TrimSuffix(result, " ")
 }
 
-// String returns the Lambda Function as a string
-func (lf LamFunc) String() string {
+// String returns the lambda abstraction as a string
+func (lf LamAbst) String() string {
 	return lf.deDeBruijn([]string{}, 0)
 }
 
-func (lf LamFunc) deDeBruijn(boundLetters []string, nextletter int) string {
+func (lf LamAbst) deDeBruijn(boundLetters []string, nextletter int) string {
 	// First make the first character undefined (for now)
 	newLetter := intToLetter(nextletter)
 	nextletter++

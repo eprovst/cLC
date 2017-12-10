@@ -1,4 +1,4 @@
--- First we define functions on Church numerals
+-- First we define operations on Church numerals
 let plus  = \m.\n.\f.\x.m f (n f x)
 let succ  = \n.\f.\x.f (n f x)
 let mult  = \m.\n.\f.m (n f)

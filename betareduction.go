@@ -17,7 +17,7 @@ func (lx LamExpr) substitute(index int, sub interface{}) LamExpr {
 		case LamExpr:
 			nw = append(nw, term.substitute(index, sub))
 
-		case LamFunc:
+		case LamAbst:
 			nw = append(nw, term.substitute(index+1, shiftIndex(1, 0, sub)))
 		}
 	}
@@ -26,11 +26,11 @@ func (lx LamExpr) substitute(index int, sub interface{}) LamExpr {
 }
 
 // substitute replaces index by sub
-func (lf LamFunc) substitute(index int, sub interface{}) LamFunc {
-	return LamFunc(LamExpr(lf).substitute(index, sub))
+func (lf LamAbst) substitute(index int, sub interface{}) LamAbst {
+	return LamAbst(LamExpr(lf).substitute(index, sub))
 }
 
 // betaReduce replaces index 0 by sub and returns a LamExpr
-func (lf LamFunc) betaReduce(sub interface{}) LamExpr {
+func (lf LamAbst) betaReduce(sub interface{}) LamExpr {
 	return shiftIndex(-1, 1, LamExpr(lf).substitute(0, shiftIndex(1, 0, sub))).(LamExpr)
 }

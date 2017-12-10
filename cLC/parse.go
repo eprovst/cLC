@@ -27,10 +27,20 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		return cLCStatement{command: "info"}, nil
 
 	case "let":
-		// TODO: Make more robust
 		stmnt = strings.TrimPrefix(stmnt, "let")
-		varname := strings.TrimSpace(strings.TrimSuffix(strings.SplitAfter(stmnt, "=")[0], "="))
-		expression, err := LamCalc.ParseString(strings.SplitAfter(stmnt, "=")[1], globals)
+		splitStmnt := strings.SplitAfter(stmnt, "=")
+
+		if len(splitStmnt) < 2 {
+			return cLCStatement{}, errors.New("no expression in let operation")
+		}
+
+		varname := strings.TrimSpace(strings.TrimSuffix(splitStmnt[0], "="))
+
+		if strings.HasPrefix(varname, "\\") || strings.Contains(varname, " ") {
+			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in let operation")
+		}
+
+		expression, err := LamCalc.ParseString(splitStmnt[1], globals)
 
 		if err != nil {
 			return cLCStatement{}, err
@@ -42,10 +52,20 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		}, nil
 
 	case "wlet":
-		// TODO: Make more robust
 		stmnt = strings.TrimPrefix(stmnt, "wlet")
-		varname := strings.TrimSpace(strings.TrimSuffix(strings.SplitAfter(stmnt, "=")[0], "="))
-		expression, err := LamCalc.ParseString(strings.SplitAfter(stmnt, "=")[1], globals)
+		splitStmnt := strings.SplitAfter(stmnt, "=")
+
+		if len(splitStmnt) < 2 {
+			return cLCStatement{}, errors.New("no expression in wlet operation")
+		}
+
+		varname := strings.TrimSpace(strings.TrimSuffix(splitStmnt[0], "="))
+
+		if strings.HasPrefix(varname, "\\") || strings.Contains(varname, " ") {
+			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in wlet operation")
+		}
+
+		expression, err := LamCalc.ParseString(splitStmnt[1], globals)
 
 		if err != nil {
 			return cLCStatement{}, err
@@ -59,10 +79,19 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 	case "fold":
 		// TODO: Make more robust
 		stmnt = strings.TrimPrefix(stmnt, "fold")
-		expression, err := LamCalc.ParseString(strings.TrimSuffix(strings.SplitAfter(stmnt, "into")[0], "into"), globals)
-		vars := strings.Fields(strings.SplitAfter(stmnt, "into")[1])
+		splitStmnt := strings.SplitAfter(stmnt, "into")
 
-		if err != nil {
+		if len(splitStmnt) < 2 {
+			return cLCStatement{}, errors.New("no targets in fold operation")
+		}
+
+		expression, err := LamCalc.ParseString(strings.TrimSuffix(splitStmnt[0], "into"), globals)
+		vars := strings.Fields(splitStmnt[1])
+
+		if len(vars) == 0 {
+			return cLCStatement{}, errors.New("no targets in fold operation")
+
+		} else if err != nil {
 			return cLCStatement{}, err
 		}
 

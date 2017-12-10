@@ -15,7 +15,7 @@ func (lx LamExpr) containsIdx(idx int) bool {
 				return true
 			}
 
-		case LamFunc:
+		case LamAbst:
 			if term.containsIdx(idx + 1) {
 				return true
 			}
@@ -25,11 +25,11 @@ func (lx LamExpr) containsIdx(idx int) bool {
 	return false
 }
 
-func (lf LamFunc) containsIdx(idx int) bool {
+func (lf LamAbst) containsIdx(idx int) bool {
 	return LamExpr(lf).containsIdx(idx)
 }
 
-func (lf LamFunc) etaReduce() LamTerm {
+func (lf LamAbst) etaReduce() LamTerm {
 	last := lf[len(lf)-1]
 
 	if len(lf) >= 2 && reflect.TypeOf(last).Kind() == reflect.Int && last.(int) == 0 {
@@ -40,7 +40,7 @@ func (lf LamFunc) etaReduce() LamTerm {
 	}
 
 	// If zero exists it had significance: no eta reduction at this level
-	return LamFunc{LamExpr(lf).etaReduce()}
+	return LamAbst{LamExpr(lf).etaReduce()}
 }
 
 func (lx LamExpr) etaReduce() LamTerm {
@@ -51,7 +51,7 @@ func (lx LamExpr) etaReduce() LamTerm {
 		case int:
 			nw = append(nw, term)
 
-		case LamFunc:
+		case LamAbst:
 			nw = append(nw, term.etaReduce())
 
 		case LamExpr:

@@ -26,8 +26,8 @@ func (lx LamExpr) alphaEquivalent(other LamTerm) bool {
 				return false
 			}
 
-		case LamFunc:
-			if reflect.TypeOf(other.index(i)).String() != "LamCalc.LamFunc" || !LamExpr(elem).alphaEquivalent(LamExpr(other.index(i).(LamFunc))) {
+		case LamAbst:
+			if reflect.TypeOf(other.index(i)).String() != "LamCalc.LamAbst" || !LamExpr(elem).alphaEquivalent(LamExpr(other.index(i).(LamAbst))) {
 				return false
 			}
 
@@ -39,12 +39,12 @@ func (lx LamExpr) alphaEquivalent(other LamTerm) bool {
 	return true
 }
 
-// Equals checks wether a LamFunc and a LamTerm are identical
-func (lf LamFunc) alphaEquivalent(other LamTerm) bool {
+// Equals checks wether a LamAbst and a LamTerm are identical
+func (lf LamAbst) alphaEquivalent(other LamTerm) bool {
 
-	if reflect.TypeOf(other).String() != "LamCalc.LamFunc" {
+	if reflect.TypeOf(other).String() != "LamCalc.LamAbst" {
 		return false
 	}
 
-	return LamExpr(lf).alphaEquivalent(LamExpr(other.(LamFunc)))
+	return LamExpr(lf).alphaEquivalent(LamExpr(other.(LamAbst)))
 }
