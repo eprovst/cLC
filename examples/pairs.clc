@@ -1,0 +1,5 @@
+-- Church pairs
+let pair   = \x.\y.\z.z x y
+let first  = \p.p (\x.\y.x)
+let second = \p.p (\x.\y.y)
+

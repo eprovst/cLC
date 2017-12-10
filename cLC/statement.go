@@ -18,6 +18,7 @@ func executeStatement(stmnt cLCStatement) {
 	switch stmnt.command {
 	case "none":
 		// Nothing to do
+
 	case "exit":
 		os.Exit(0)
 

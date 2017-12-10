@@ -1,5 +1,18 @@
--- This builds upon comparing.clc and Y.clc
-load comparing.clc Y.clc
+-- Since Church numerals apply an abstraction n times to another abstraction
+-- we can make use of pairs and a function that gets us from (n+1, n!) to
+-- (n+2, (n+1)!) starting from (1, 1). And then finaly take the second of the
+-- resulting pair.
 
-let  hfac = \f.\n.if (LEQ n 1) 1 (mult n (f (minus n 1)))
-wlet fac  = Y hfac
+load numerals.clc pairs.clc
+let fac = \n.second (n (\p.pair (succ (first p)) (mult (first p) (second p))) (pair 1 1))
+
+-- Based on:
+-- Henning Makholm (https://math.stackexchange.com/users/14366/henning-makholm),
+-- Lambda Calculus factorial, URL (version: 2017-04-07): https://math.stackexchange.com/q/2222637
+
+
+-- The below is the more common -- and slower -- approach using the Y combinator.
+
+-- load comparing.clc Y.clc
+-- wlet fac  = Y \f.\n.if (LEQ n 1) 1 (mult n (f (minus n 1)))
+
