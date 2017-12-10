@@ -77,7 +77,6 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		}, nil
 
 	case "fold":
-		// TODO: Make more robust
 		stmnt = strings.TrimPrefix(stmnt, "fold")
 		splitStmnt := strings.SplitAfter(stmnt, "into")
 

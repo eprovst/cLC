@@ -22,7 +22,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 	i := 0
 
 	if expr[i] == '\\' {
-		if len(expr) < 3 {
+		if len(expr) < 2 {
 			return term, errors.New("no local variable specified in abstraction")
 		}
 
@@ -42,12 +42,13 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 		avar := ""
 
 		for ; i < len(expr) && expr[i] != '.'; i++ {
-			if expr[i] != ' ' {
-				avar += string(expr[i])
-			}
+			avar += string(expr[i])
 		}
 
-		if i == len(expr) {
+		if strings.HasPrefix(avar, "\\") || strings.Contains(avar, " ") {
+			return term, errors.New("invalid variable name '" + avar + "'")
+
+		} else if i >= len(expr)-1 {
 			return term, errors.New("abstraction body not started")
 		}
 
