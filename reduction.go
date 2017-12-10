@@ -41,8 +41,8 @@ func (lf LamAbst) reduceOnce() LamTerm {
 
 // Reduce reduces a lambda expression
 func (lx LamExpr) Reduce() (LamAbst, error) {
-	ls := lx.simplify()
-	nw := ls.reduceOnce().simplify()
+	ls := lx.Simplify()
+	nw := ls.reduceOnce().Simplify()
 
 	for c := 0; !nw.alphaEquivalent(ls); c++ {
 		if c == MaxReductions {
@@ -50,16 +50,16 @@ func (lx LamExpr) Reduce() (LamAbst, error) {
 		}
 
 		ls = nw
-		nw = nw.reduceOnce().simplify()
+		nw = nw.reduceOnce().Simplify()
 	}
 
-	return nw.(LamAbst).etaReduce().simplify().(LamAbst), nil
+	return nw.(LamAbst).etaReduce().Simplify().(LamAbst), nil
 }
 
 // Reduce reduces a lambda abstraction
 func (lf LamAbst) Reduce() (LamAbst, error) {
-	ls := lf.simplify()
-	nw := ls.reduceOnce().simplify()
+	ls := lf.Simplify()
+	nw := ls.reduceOnce().Simplify()
 
 	for c := 0; !nw.alphaEquivalent(ls); c++ {
 		if c == MaxReductions {
@@ -67,22 +67,22 @@ func (lf LamAbst) Reduce() (LamAbst, error) {
 		}
 
 		ls = nw
-		nw = nw.reduceOnce().simplify()
+		nw = nw.reduceOnce().Simplify()
 	}
 
-	return nw.(LamAbst).etaReduce().simplify().(LamAbst), nil
+	return nw.(LamAbst).etaReduce().Simplify().(LamAbst), nil
 }
 
 // WHNFReduce reduces the expression till a weak head normal form is found (eta reduction isn't tried)
 func (lx LamExpr) WHNFReduce() (LamAbst, error) {
-	nw := lx.reduceOnce().simplify()
+	nw := lx.Simplify()
 
 	for c := 0; reflect.TypeOf(nw).String() != "LamCalc.LamAbst"; c++ {
 		if c == MaxReductions {
 			return LamAbst{}, errors.New("exeeded maximum amount of reductions")
 		}
 
-		nw = nw.reduceOnce().simplify()
+		nw = nw.reduceOnce().Simplify()
 	}
 
 	return nw.(LamAbst), nil

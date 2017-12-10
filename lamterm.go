@@ -7,18 +7,18 @@ type LamTerm interface {
 	index(int) interface{}
 	append(...interface{}) LamTerm
 
-	// equivalence.go
-	Equivalent(LamTerm) bool
-
 	// alphaequivalence.go
 	alphaEquivalent(LamTerm) bool
+
+	// equivalence.go
+	Equivalent(LamTerm) bool
 
 	// stringify.go
 	String() string
 	deDeBruijn(boundLetters []string, nextletter int) string
 
 	// simplify.go
-	simplify() LamTerm
+	Simplify() LamTerm
 
 	// reduction.go
 	Reduce() (LamAbst, error)

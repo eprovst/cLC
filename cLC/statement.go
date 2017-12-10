@@ -67,10 +67,10 @@ func executeStatement(stmnt cLCStatement) {
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n")
 
 		couldFold := false
-		for _, term := range stmnt.parameters[1].([]string) {
-			if globals[term].Equivalent(expression) {
+		for _, gvar := range stmnt.parameters[1].([]string) {
+			if globals[gvar].Equivalent(expression) {
 				fmt.Print(expression.String() + " =\n\n")
-				fmt.Print("    " + term + "\n\n")
+				fmt.Print("    " + gvar + "\n\n")
 				couldFold = true
 				break
 			}

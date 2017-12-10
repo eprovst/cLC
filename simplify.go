@@ -3,10 +3,10 @@ package LamCalc
 import "reflect"
 
 // Simplify (tries) to remove unnecessary brackets
-func (lx LamExpr) simplify() LamTerm {
+func (lx LamExpr) Simplify() LamTerm {
 	if len(lx) == 1 {
 		if reflect.TypeOf(lx[0]).Kind() != reflect.Int {
-			return lx[0].(LamTerm).simplify()
+			return lx[0].(LamTerm).Simplify()
 		}
 
 		return lx
@@ -18,7 +18,7 @@ func (lx LamExpr) simplify() LamTerm {
 			res = append(res, lx[1:]...)
 		}
 
-		return res.simplify()
+		return res.Simplify()
 	}
 
 	res := LamExpr{}
@@ -26,7 +26,7 @@ func (lx LamExpr) simplify() LamTerm {
 	for _, term := range lx {
 		switch term := term.(type) {
 		case LamTerm:
-			switch simpl := term.simplify().(type) {
+			switch simpl := term.Simplify().(type) {
 			case LamExpr:
 				if len(simpl) == 1 {
 					res = append(res, simpl[0])
@@ -47,8 +47,8 @@ func (lx LamExpr) simplify() LamTerm {
 }
 
 // Simplify (tries) to remove unnecessary brackets
-func (lf LamAbst) simplify() LamTerm {
-	simpl := LamExpr(lf).simplify()
+func (lf LamAbst) Simplify() LamTerm {
+	simpl := LamExpr(lf).Simplify()
 
 	switch simpl := simpl.(type) {
 	case LamExpr:
