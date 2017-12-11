@@ -1,0 +1,8 @@
+-- We use the Church encoding using one pair as a list node
+
+load booleans.clc pairs.clc
+let cons  = pair
+let head  = first
+let tail  = second
+let nil   = false
+let isnil = \l.l (\h.\t.\d.false) true

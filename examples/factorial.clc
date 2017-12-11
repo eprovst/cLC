@@ -14,5 +14,4 @@ let fac = \n.second (n (\p.pair (succ (first p)) (mult (first p) (second p))) (p
 -- The below is the more common -- and slower -- approach using the Y combinator.
 
 -- load comparing.clc Y.clc
--- wlet fac  = Y \f.\n.if (LEQ n 1) 1 (mult n (f (pred n)))
-
+-- wlet fac  = Y \f.\n.if (IsZero n) 1 (mult n (f (pred n)))
