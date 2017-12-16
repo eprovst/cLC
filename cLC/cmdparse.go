@@ -36,7 +36,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 		varname := strings.TrimSpace(strings.TrimSuffix(splitStmnt[0], "="))
 		// \ should always become λ
-		varname = strings.Replace(varname, "λ", "\\", -1)
+		varname = strings.Replace(varname, "\\", "λ", -1)
 
 		if !isValidVariableName(varname) {
 			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in let operation")
@@ -63,7 +63,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 		varname := strings.TrimSpace(strings.TrimSuffix(splitStmnt[0], "="))
 		// \ should always become λ
-		varname = strings.Replace(varname, "λ", "\\", -1)
+		varname = strings.Replace(varname, "\\", "λ", -1)
 
 		if !isValidVariableName(varname) {
 			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in wlet operation")
