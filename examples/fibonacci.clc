@@ -1,0 +1,4 @@
+-- Implements the fibonacci series using Church pairs
+load pairs.clc numerals.clc
+
+let fib = λn.second (n (λp.pair (plus (first p) (second p)) (first p)) (pair 1 1))

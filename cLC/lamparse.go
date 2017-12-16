@@ -1,23 +1,29 @@
-package LamCalc
+package main
 
 import (
 	"errors"
 	"strings"
+
+	"github.com/ElecProg/LamCalc"
 )
 
-// ParseString turns the input into a LamTerm
-func ParseString(expr string, globals map[string]LamAbst) (LamTerm, error) {
+// parseString turns the input into a LamTerm
+func parseString(expr string, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
 	expr = strings.TrimSpace(expr)
 
+	// Support the lambda as well as the backslash
+	expr = strings.Replace(expr, "λ", "\\", -1)
+	println(expr)
+
 	if len(expr) == 0 {
-		return LamExpr{}, errors.New("no expression present")
+		return LamCalc.LamExpr{}, errors.New("no expression present")
 	}
 
 	return furtherParseString(expr, map[string]int{}, globals)
 }
 
-func furtherParseString(expr string, boundVars map[string]int, globals map[string]LamAbst) (LamTerm, error) {
-	var term LamTerm
+func furtherParseString(expr string, boundVars map[string]int, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
+	var term LamCalc.LamTerm
 
 	i := 0
 
@@ -27,7 +33,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 		}
 
 		i++
-		term = LamAbst{}
+		term = LamCalc.LamAbst{}
 
 		// Create copy of boundVars where every index is one higher
 		oldVars := boundVars
@@ -58,7 +64,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 		boundVars[avar] = 0
 
 	} else {
-		term = LamExpr{}
+		term = LamCalc.LamExpr{}
 	}
 
 	for ; i < len(expr); i++ {
@@ -72,7 +78,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 				return term, err
 			}
 
-			term = term.append(part)
+			term = appendToLT(term, part)
 
 		case '(':
 			var cterm interface{}
@@ -99,7 +105,7 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 				return term, err
 			}
 
-			term = term.append(cterm)
+			term = appendToLT(term, cterm)
 
 		case ' ':
 			// Skip spaces
@@ -124,11 +130,11 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 			cindex, ok := boundVars[cvar]
 
 			if ok {
-				term = term.append(cindex)
+				term = appendToLT(term, cindex)
 			} else {
 				cfnc, ok := globals[cvar]
 				if ok {
-					term = term.append(cfnc)
+					term = appendToLT(term, cfnc)
 				} else {
 					return term, errors.New("'" + cvar + "' not yet defined")
 				}
@@ -137,4 +143,15 @@ func furtherParseString(expr string, boundVars map[string]int, globals map[strin
 	}
 
 	return term, nil
+}
+
+// Utility to add to a LamCalc.LamTerm
+func appendToLT(original LamCalc.LamTerm, toAdd ...interface{}) LamCalc.LamTerm {
+	switch original.(type) {
+	case LamCalc.LamAbst:
+		return append(original.(LamCalc.LamAbst), toAdd...)
+
+	default:
+		return append(original.(LamCalc.LamExpr), toAdd...)
+	}
 }

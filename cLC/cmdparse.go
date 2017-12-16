@@ -3,8 +3,6 @@ package main
 import (
 	"errors"
 	"strings"
-
-	"github.com/ElecProg/LamCalc"
 )
 
 func parseStatement(stmnt string) (cLCStatement, error) {
@@ -42,7 +40,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in let operation")
 		}
 
-		expression, err := LamCalc.ParseString(splitStmnt[1], globals)
+		expression, err := parseString(splitStmnt[1], globals)
 
 		if err != nil {
 			return cLCStatement{}, err
@@ -67,7 +65,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in wlet operation")
 		}
 
-		expression, err := LamCalc.ParseString(splitStmnt[1], globals)
+		expression, err := parseString(splitStmnt[1], globals)
 
 		if err != nil {
 			return cLCStatement{}, err
@@ -86,7 +84,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 			return cLCStatement{}, errors.New("no targets in fold operation")
 		}
 
-		expression, err := LamCalc.ParseString(strings.TrimSuffix(splitStmnt[0], "into"), globals)
+		expression, err := parseString(strings.TrimSuffix(splitStmnt[0], "into"), globals)
 		vars := strings.Fields(splitStmnt[1])
 
 		if len(vars) == 0 {
@@ -115,7 +113,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 	case "weak":
 		stmnt = strings.TrimPrefix(stmnt, "weak")
-		expression, err := LamCalc.ParseString(stmnt, globals)
+		expression, err := parseString(stmnt, globals)
 
 		if err != nil {
 			return cLCStatement{}, err
@@ -127,7 +125,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		}, nil
 
 	default:
-		expression, err := LamCalc.ParseString(stmnt, globals)
+		expression, err := parseString(stmnt, globals)
 
 		if err != nil {
 			return cLCStatement{}, err

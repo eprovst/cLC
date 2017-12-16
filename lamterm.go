@@ -5,10 +5,12 @@ type LamTerm interface {
 	// Allow us to manipulate it as a list
 	len() int
 	index(int) interface{}
-	append(...interface{}) LamTerm
 
 	// alphaequivalence.go
 	alphaEquivalent(LamTerm) bool
+
+	// etareduction.go
+	etaReduce() LamTerm
 
 	// equivalence.go
 	Equivalent(LamTerm) bool
@@ -21,7 +23,7 @@ type LamTerm interface {
 	Simplify() LamTerm
 
 	// reduction.go
-	Reduce() (LamAbst, error)
+	Reduce() (LamTerm, error)
 	WHNFReduce() (LamAbst, error)
 	reduceOnce() LamTerm
 }
@@ -38,10 +40,6 @@ func (lx LamExpr) index(i int) interface{} {
 	return lx[i]
 }
 
-func (lx LamExpr) append(terms ...interface{}) LamTerm {
-	return append(lx, terms...)
-}
-
 // LamAbst is a list of LamAbsts, lamexprns and De Bruijn indexes (all lowered by one)
 type LamAbst []interface{}
 
@@ -52,8 +50,4 @@ func (lf LamAbst) len() int {
 
 func (lf LamAbst) index(i int) interface{} {
 	return lf[i]
-}
-
-func (lf LamAbst) append(terms ...interface{}) LamTerm {
-	return append(lf, terms...)
 }

@@ -6,6 +6,7 @@ import (
 )
 
 // MaxReductions determines the maximum amount of expansions before we give up
+// use a negative value to have no limit (use with care...)
 var MaxReductions = 10000
 
 // reduceOnce reduces a lambda expression once
@@ -39,8 +40,8 @@ func (lf LamAbst) reduceOnce() LamTerm {
 	return LamAbst{LamExpr(lf).reduceOnce()}
 }
 
-// Reduce reduces a lambda expression
-func (lx LamExpr) Reduce() (LamAbst, error) {
+// Reduce reduces a lambda expression using normal order
+func (lx LamExpr) Reduce() (LamTerm, error) {
 	ls := lx.Simplify()
 	nw := ls.reduceOnce().Simplify()
 
@@ -53,11 +54,11 @@ func (lx LamExpr) Reduce() (LamAbst, error) {
 		nw = nw.reduceOnce().Simplify()
 	}
 
-	return nw.(LamAbst).etaReduce().Simplify().(LamAbst), nil
+	return nw.etaReduce().Simplify(), nil
 }
 
-// Reduce reduces a lambda abstraction
-func (lf LamAbst) Reduce() (LamAbst, error) {
+// Reduce reduces a lambda abstraction using normal order
+func (lf LamAbst) Reduce() (LamTerm, error) {
 	ls := lf.Simplify()
 	nw := ls.reduceOnce().Simplify()
 
@@ -70,7 +71,7 @@ func (lf LamAbst) Reduce() (LamAbst, error) {
 		nw = nw.reduceOnce().Simplify()
 	}
 
-	return nw.(LamAbst).etaReduce().Simplify().(LamAbst), nil
+	return nw.etaReduce().Simplify(), nil
 }
 
 // WHNFReduce reduces the expression till a weak head normal form is found (eta reduction isn't tried)

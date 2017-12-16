@@ -38,7 +38,15 @@ func executeStatement(stmnt cLCStatement) {
 		showInfo()
 
 	case "let":
-		lf, err := stmnt.parameters[1].(LamCalc.LamTerm).Reduce()
+		lx, err := stmnt.parameters[1].(LamCalc.LamTerm).Reduce()
+
+		if err != nil {
+			printError(err)
+			return
+		}
+
+		// Make sure it's a function
+		lf, err := lx.WHNFReduce()
 
 		if err != nil {
 			printError(err)

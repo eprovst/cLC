@@ -77,7 +77,7 @@ func (lf LamAbst) deDeBruijn(boundLetters []string, nextletter int) string {
 	nextletter++
 
 	boundLetters = append([]string{newLetter}, boundLetters...)
-	result := "\\" + newLetter + "."
+	result := "λ" + newLetter + "."
 
 	lx := LamExpr(lf)
 	result += lx.deDeBruijn(boundLetters, nextletter)
