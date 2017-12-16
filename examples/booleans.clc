@@ -1,11 +1,11 @@
 -- Chruch booleans
 
-let true   = \x.\y.x
-let false  = \x.\y.y
+let true   = λx.λy.x
+let false  = λx.λy.y
 
-let not = \x.x false true
+let not = λx.x false true
 
-let and = \a.\b.a b false
-let or  = \a.\b.a true b
-let xor = \a.\b.a (not b) b
-let if  = \p.\then.\else.p then else
+let and = λa.λb.a b false
+let or  = λa.λb.a true b
+let xor = λa.λb.a (not b) b
+let if  = λp.λthen.λelse.p then else

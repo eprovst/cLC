@@ -1,0 +1,15 @@
+-- Fixed-point combinators
+
+-- The Haskell Curry's famous Y combinator
+wlet Y  = λf.(λx.f (x x)) (λx.f (x x))
+-- = X  = λf.(λx.x x) (λx.f (x x))
+
+-- John Tromp's fixed-point combinator
+wlet Y' = (λx.λy.x y x) (λy.λx.y (x y x))
+
+-- Turing's fixed-point combinator
+wlet Θ     = (λx. λy. (y (x x y))) (λx. λy. (y (x x y)))
+wlet Theta = Θ
+
+-- The Z combinator
+wlet Z = λf.(λy.f (λz.y y z)) (λy.f (λz.y y z))

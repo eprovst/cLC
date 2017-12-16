@@ -1,8 +1,11 @@
 -- The S K (I) calculus
 
-let S  = \x.\y.\z.x z (y z)
-let K  = \x.\y.x
+let S = λx.λy.λz.x z (y z)
+--    = ι(ι(ι(ι ι)))
+let K = λx.λy.x
+--    = ι(ι(ι ι))
 
 let K* = S K
 let I  = S K K
+--     = ι ι
 -- Note: the last K could be replaced with any lambda term

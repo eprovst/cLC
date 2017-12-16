@@ -5,4 +5,4 @@ let cons  = pair
 let head  = first
 let tail  = second
 let nil   = false
-let isnil = \l.l (\h.\t.\d.false) true
+let isnil = λl.l (λh.λt.λd.false) true

@@ -13,16 +13,15 @@ func parseString(expr string, globals map[string]LamCalc.LamAbst) (LamCalc.LamTe
 
 	// Support the lambda as well as the backslash
 	expr = strings.Replace(expr, "λ", "\\", -1)
-	println(expr)
 
 	if len(expr) == 0 {
 		return LamCalc.LamExpr{}, errors.New("no expression present")
 	}
 
-	return furtherParseString(expr, map[string]int{}, globals)
+	return furtherParseString([]rune(expr), map[string]int{}, globals)
 }
 
-func furtherParseString(expr string, boundVars map[string]int, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
+func furtherParseString(expr []rune, boundVars map[string]int, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
 	var term LamCalc.LamTerm
 
 	i := 0

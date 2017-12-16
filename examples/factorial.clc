@@ -4,7 +4,7 @@
 -- resulting pair.
 
 load numerals.clc pairs.clc
-let fac = \n.second (n (\p.pair (succ (first p)) (mult (first p) (second p))) (pair 1 1))
+let fac = λn.second (n (λp.pair (succ (first p)) (mult (first p) (second p))) (pair 1 1))
 
 -- Based on:
 -- Henning Makholm (https://math.stackexchange.com/users/14366/henning-makholm),
@@ -13,5 +13,5 @@ let fac = \n.second (n (\p.pair (succ (first p)) (mult (first p) (second p))) (p
 
 -- The below is the more common -- and slower -- approach using the Y combinator.
 
--- load comparing.clc Y.clc
--- wlet fac  = Y \f.\n.if (IsZero n) 1 (mult n (f (pred n)))
+-- load comparing.clc fix.clc
+-- wlet fac = Y λf.λn.if (IsZero n) 1 (mult n (f (pred n)))
