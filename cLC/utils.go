@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func printError(err error) {
@@ -52,4 +53,8 @@ Copyright (c) 2017 Evert Provoost.
 All Rights Reserved.
 
 `)
+}
+
+func isValidVariableName(varname string) bool {
+	return !strings.HasPrefix(varname, "\\") && !strings.HasPrefix(varname, "λ") && !strings.ContainsAny(varname, " \t")
 }

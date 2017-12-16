@@ -50,7 +50,9 @@ func furtherParseString(expr []rune, boundVars map[string]int, globals map[strin
 			avar += string(expr[i])
 		}
 
-		if strings.HasPrefix(avar, "\\") || strings.Contains(avar, " ") {
+		if !isValidVariableName(avar) {
+			// Consistently show λ's in output
+			avar = strings.Replace(avar, "\\", "λ", -1)
 			return term, errors.New("invalid variable name '" + avar + "'")
 
 		} else if i >= len(expr)-1 {
@@ -105,6 +107,9 @@ func furtherParseString(expr []rune, boundVars map[string]int, globals map[strin
 			}
 
 			term = appendToLT(term, cterm)
+
+		case '\t':
+			// Skip tabs
 
 		case ' ':
 			// Skip spaces
