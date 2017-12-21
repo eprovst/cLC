@@ -4,7 +4,7 @@ package LamCalc
 func shiftIndex(correction int, cutoff int, expr LamTerm) LamTerm {
 	switch expr := expr.(type) {
 	case LamVar:
-		if expr >= LamVar(cutoff) {
+		if int(expr) >= cutoff {
 			return expr + LamVar(correction)
 		}
 

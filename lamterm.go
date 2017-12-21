@@ -1,7 +1,5 @@
 package LamCalc
 
-// TODO: Use the fact that LamVar is a LamTerm more in the source
-
 // LamTerm is a general type to represent both LamExprns and LamAbsts
 type LamTerm interface {
 	// alphaequivalence.go
@@ -11,6 +9,7 @@ type LamTerm interface {
 	substitute(LamVar, LamTerm) LamTerm
 
 	// etareduction.go
+	containsVar(LamVar) bool
 	etaReduce() LamTerm
 
 	// equivalence.go

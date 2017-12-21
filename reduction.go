@@ -24,13 +24,7 @@ func (lx LamExpr) reduceOnce() LamTerm {
 	}
 
 	for _, term := range lx {
-		switch term := term.(type) {
-		case LamVar:
-			nw = append(nw, term)
-
-		case LamTerm:
-			nw = append(nw, term.reduceOnce())
-		}
+		nw = append(nw, term.reduceOnce())
 	}
 
 	return nw

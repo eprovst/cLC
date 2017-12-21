@@ -34,32 +34,17 @@ func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter LamVar) string {
 	for _, part := range lx {
 		switch part := part.(type) {
 		case LamVar:
-			if part < LamVar(len(boundLetters)) && boundLetters[part] != "" {
-				result += boundLetters[part] + " "
-			} else {
-				newLetter := varToLetter(nextletter)
-				nextletter++
-
-				for i := LamVar(len(boundLetters)); i < part; i++ {
-					boundLetters = append(boundLetters, "")
-				}
-
-				boundLetters = append(boundLetters, newLetter)
-				result += newLetter + " "
-			}
+			result += part.deDeBruijn(boundLetters, nextletter) + " "
 
 		case LamAbst:
 			if len(lx) == 1 {
 				result += part.deDeBruijn(boundLetters, nextletter)
 			} else {
-				result = result + "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
+				result += "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
 			}
 
 		case LamExpr:
-			result = result + "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
-
-		default:
-			panic("invalid type in LamExpr")
+			result += "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
 		}
 	}
 
@@ -87,9 +72,21 @@ func (la LamAbst) deDeBruijn(boundLetters []string, nextletter LamVar) string {
 
 // String returns the lambda variable as a string
 func (lv LamVar) String() string {
-	return LamExpr{lv}.String()
+	return lv.deDeBruijn([]string{}, LamVar(0))
 }
 
 func (lv LamVar) deDeBruijn(boundLetters []string, nextletter LamVar) string {
-	return LamExpr{lv}.deDeBruijn(boundLetters, nextletter)
+	if lv < LamVar(len(boundLetters)) && boundLetters[lv] != "" {
+		return boundLetters[lv]
+	}
+
+	newLetter := varToLetter(nextletter)
+	nextletter++
+
+	for i := LamVar(len(boundLetters)); i < lv; i++ {
+		boundLetters = append(boundLetters, "")
+	}
+
+	boundLetters = append(boundLetters, newLetter)
+	return newLetter
 }
