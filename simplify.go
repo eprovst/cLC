@@ -5,11 +5,7 @@ import "reflect"
 // Simplify (tries) to remove unnecessary brackets
 func (lx LamExpr) Simplify() LamTerm {
 	if len(lx) == 1 {
-		if reflect.TypeOf(lx[0]).Kind() != reflect.Int {
-			return lx[0].(LamTerm).Simplify()
-		}
-
-		return lx
+		return lx[0].Simplify()
 
 	} else if reflect.TypeOf(lx[0]).String() == "LamCalc.LamExpr" {
 		res := lx[0].(LamExpr)
@@ -24,18 +20,12 @@ func (lx LamExpr) Simplify() LamTerm {
 	res := LamExpr{}
 
 	for _, term := range lx {
-		switch term := term.(type) {
-		case LamTerm:
-			switch simpl := term.Simplify().(type) {
-			case LamExpr:
-				if len(simpl) == 1 {
-					res = append(res, simpl[0])
-				} else {
-					res = append(res, simpl)
-				}
-
-			case LamAbst:
-				res = append(res, simpl)
+		switch term := term.Simplify().(type) {
+		case LamExpr:
+			if len(term) == 1 {
+				res = append(res, term[0])
+			} else {
+				res = append(res, term)
 			}
 
 		default:
@@ -47,14 +37,19 @@ func (lx LamExpr) Simplify() LamTerm {
 }
 
 // Simplify (tries) to remove unnecessary brackets
-func (lf LamAbst) Simplify() LamTerm {
-	simpl := LamExpr(lf).Simplify()
+func (la LamAbst) Simplify() LamTerm {
+	simpl := LamExpr(la).Simplify()
 
 	switch simpl := simpl.(type) {
 	case LamExpr:
 		return LamAbst(simpl)
 
 	default:
-		return LamAbst{simpl.(LamAbst)}
+		return LamAbst{simpl}
 	}
+}
+
+// Simplify (tries) to remove unnecessary brackets
+func (lv LamVar) Simplify() LamTerm {
+	return lv
 }

@@ -25,7 +25,7 @@ func (lx LamExpr) reduceOnce() LamTerm {
 
 	for _, term := range lx {
 		switch term := term.(type) {
-		case int:
+		case LamVar:
 			nw = append(nw, term)
 
 		case LamTerm:
@@ -36,8 +36,12 @@ func (lx LamExpr) reduceOnce() LamTerm {
 	return nw
 }
 
-func (lf LamAbst) reduceOnce() LamTerm {
-	return LamAbst{LamExpr(lf).reduceOnce()}
+func (la LamAbst) reduceOnce() LamTerm {
+	return LamAbst{LamExpr(la).reduceOnce()}
+}
+
+func (lv LamVar) reduceOnce() LamTerm {
+	return lv
 }
 
 // Reduce reduces a lambda expression using normal order
@@ -58,8 +62,8 @@ func (lx LamExpr) Reduce() (LamTerm, error) {
 }
 
 // Reduce reduces a lambda abstraction using normal order
-func (lf LamAbst) Reduce() (LamTerm, error) {
-	ls := lf.Simplify()
+func (la LamAbst) Reduce() (LamTerm, error) {
+	ls := la.Simplify()
 	nw := ls.reduceOnce().Simplify()
 
 	for c := 0; !nw.alphaEquivalent(ls); c++ {
@@ -72,6 +76,11 @@ func (lf LamAbst) Reduce() (LamTerm, error) {
 	}
 
 	return nw.etaReduce().Simplify(), nil
+}
+
+// Reduce won't work on a free variable
+func (lv LamVar) Reduce() (LamTerm, error) {
+	return nil, errors.New("can't reduce free variable")
 }
 
 // WHNFReduce reduces the expression till a weak head normal form is found (eta reduction isn't tried)
@@ -91,6 +100,11 @@ func (lx LamExpr) WHNFReduce() (LamAbst, error) {
 
 // WHNFReduce reduces the abstraction till a weak head normal form is found (eta reduction isn't tried)
 // ie. doesn't do anything
-func (lf LamAbst) WHNFReduce() (LamAbst, error) {
-	return lf, nil
+func (la LamAbst) WHNFReduce() (LamAbst, error) {
+	return la, nil
+}
+
+// WHNFReduce won't work on a free variable
+func (lv LamVar) WHNFReduce() (LamAbst, error) {
+	return nil, errors.New("can't reduce free variable to WHNF")
 }

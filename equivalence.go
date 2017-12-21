@@ -9,6 +9,11 @@ func (lx LamExpr) Equivalent(other LamTerm) bool {
 }
 
 // Equivalent checks if the LamAbst and LamTerm are Equivalent
-func (lf LamAbst) Equivalent(other LamTerm) bool {
-	return lf.alphaEquivalent(other)
+func (la LamAbst) Equivalent(other LamTerm) bool {
+	return la.alphaEquivalent(other)
+}
+
+// Equivalent checks if the LamVar and LamTerm are Equivalent
+func (lv LamVar) Equivalent(other LamTerm) bool {
+	return lv.alphaEquivalent(other)
 }

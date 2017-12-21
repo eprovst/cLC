@@ -46,24 +46,24 @@ func executeStatement(stmnt cLCStatement) {
 		}
 
 		// Make sure it's a function
-		lf, err := lx.WHNFReduce()
+		la, err := lx.WHNFReduce()
 
 		if err != nil {
 			printError(err)
 			return
 		}
 
-		globals[stmnt.parameters[0].(string)] = lf
+		globals[stmnt.parameters[0].(string)] = la
 
 	case "wlet":
-		lf, err := stmnt.parameters[1].(LamCalc.LamTerm).WHNFReduce()
+		la, err := stmnt.parameters[1].(LamCalc.LamTerm).WHNFReduce()
 
 		if err != nil {
 			printError(err)
 			return
 		}
 
-		globals[stmnt.parameters[0].(string)] = lf
+		globals[stmnt.parameters[0].(string)] = la
 
 	case "fold":
 		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()

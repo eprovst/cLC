@@ -1,50 +1,56 @@
 package LamCalc
 
-import "reflect"
-
 // As we are using De Bruijn indexes alphaEquivalence is the same as syntactic equivalence
 
 // Equals checks wether the LamExp is identical to a LamTerm
 func (lx LamExpr) alphaEquivalent(other LamTerm) bool {
-
-	if reflect.TypeOf(other).String() != "LamCalc.LamExpr" {
-		return false
-
-	} else if len(lx) != other.len() {
-		return false
-	}
-
-	for i := range lx {
-		switch elem := lx[i].(type) {
-		case int:
-			if reflect.TypeOf(other.index(i)).Kind() != reflect.Int || elem != other.index(i).(int) {
-				return false
-			}
-
-		case LamExpr:
-			if reflect.TypeOf(other.index(i)).String() != "LamCalc.LamExpr" || !elem.alphaEquivalent(other.index(i).(LamExpr)) {
-				return false
-			}
-
-		case LamAbst:
-			if reflect.TypeOf(other.index(i)).String() != "LamCalc.LamAbst" || !LamExpr(elem).alphaEquivalent(LamExpr(other.index(i).(LamAbst))) {
-				return false
-			}
-
-		default:
+	switch other := other.(type) {
+	case LamExpr:
+		if len(lx) != len(other) {
 			return false
 		}
-	}
 
-	return true
+		for i := range lx {
+			if !lx[i].alphaEquivalent(other[i]) {
+				return false
+			}
+		}
+
+		return true
+
+	default:
+		return false
+	}
 }
 
 // Equals checks wether a LamAbst and a LamTerm are identical
-func (lf LamAbst) alphaEquivalent(other LamTerm) bool {
+func (la LamAbst) alphaEquivalent(other LamTerm) bool {
+	switch other := other.(type) {
+	case LamAbst:
+		if len(la) != len(other) {
+			return false
+		}
 
-	if reflect.TypeOf(other).String() != "LamCalc.LamAbst" {
+		for i := range la {
+			if !la[i].alphaEquivalent(other[i]) {
+				return false
+			}
+		}
+
+		return true
+
+	default:
 		return false
 	}
+}
 
-	return LamExpr(lf).alphaEquivalent(LamExpr(other.(LamAbst)))
+// Equals checks wether a LamVar and a LamTerm are identical
+func (lv LamVar) alphaEquivalent(other LamTerm) bool {
+	switch other := other.(type) {
+	case LamVar:
+		return lv == other
+
+	default:
+		return false
+	}
 }

@@ -18,10 +18,10 @@ func parseString(expr string, globals map[string]LamCalc.LamAbst) (LamCalc.LamTe
 		return LamCalc.LamExpr{}, errors.New("no expression present")
 	}
 
-	return furtherParseString([]rune(expr), map[string]int{}, globals)
+	return furtherParseString([]rune(expr), map[string]LamCalc.LamVar{}, globals)
 }
 
-func furtherParseString(expr []rune, boundVars map[string]int, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
+func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
 	var term LamCalc.LamTerm
 
 	i := 0
@@ -36,7 +36,7 @@ func furtherParseString(expr []rune, boundVars map[string]int, globals map[strin
 
 		// Create copy of boundVars where every index is one higher
 		oldVars := boundVars
-		boundVars = map[string]int{}
+		boundVars = map[string]LamCalc.LamVar{}
 
 		// First increment the index of each bound variable
 		for variable := range oldVars {
@@ -82,7 +82,7 @@ func furtherParseString(expr []rune, boundVars map[string]int, globals map[strin
 			term = appendToLT(term, part)
 
 		case '(':
-			var cterm interface{}
+			var cterm LamCalc.LamTerm
 
 			i++
 			starte := i
@@ -150,7 +150,7 @@ func furtherParseString(expr []rune, boundVars map[string]int, globals map[strin
 }
 
 // Utility to add to a LamCalc.LamTerm
-func appendToLT(original LamCalc.LamTerm, toAdd ...interface{}) LamCalc.LamTerm {
+func appendToLT(original LamCalc.LamTerm, toAdd ...LamCalc.LamTerm) LamCalc.LamTerm {
 	switch original.(type) {
 	case LamCalc.LamAbst:
 		return append(original.(LamCalc.LamAbst), toAdd...)

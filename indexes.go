@@ -1,11 +1,11 @@
 package LamCalc
 
 // shiftIndex is used to correct the De Bruijn indexes
-func shiftIndex(correction int, cutoff int, expr interface{}) interface{} {
+func shiftIndex(correction int, cutoff int, expr LamTerm) LamTerm {
 	switch expr := expr.(type) {
-	case int:
-		if expr >= cutoff {
-			return expr + correction
+	case LamVar:
+		if expr >= LamVar(cutoff) {
+			return expr + LamVar(correction)
 		}
 
 		return expr

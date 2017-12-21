@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func intToLetter(num int) string {
+func varToLetter(num LamVar) string {
 	if num < 3 {
 		// x, y, z
 		return string(rune(120 + num - 0))
@@ -20,7 +20,7 @@ func intToLetter(num int) string {
 	}
 
 	// x1, x2, x3...
-	return "x" + strconv.Itoa(num-25)
+	return "x" + strconv.Itoa(int(num)-25)
 }
 
 // String returns the Lambda Expression as a string
@@ -28,19 +28,19 @@ func (lx LamExpr) String() string {
 	return lx.deDeBruijn([]string{}, 0)
 }
 
-func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter int) string {
+func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter LamVar) string {
 	result := ""
 
 	for _, part := range lx {
 		switch part := part.(type) {
-		case int:
-			if part < int(len(boundLetters)) && boundLetters[part] != "" {
+		case LamVar:
+			if part < LamVar(len(boundLetters)) && boundLetters[part] != "" {
 				result += boundLetters[part] + " "
 			} else {
-				newLetter := intToLetter(nextletter)
+				newLetter := varToLetter(nextletter)
 				nextletter++
 
-				for i := int(len(boundLetters)); i < part; i++ {
+				for i := LamVar(len(boundLetters)); i < part; i++ {
 					boundLetters = append(boundLetters, "")
 				}
 
@@ -67,20 +67,29 @@ func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter int) string {
 }
 
 // String returns the lambda abstraction as a string
-func (lf LamAbst) String() string {
-	return lf.deDeBruijn([]string{}, 0)
+func (la LamAbst) String() string {
+	return la.deDeBruijn([]string{}, LamVar(0))
 }
 
-func (lf LamAbst) deDeBruijn(boundLetters []string, nextletter int) string {
+func (la LamAbst) deDeBruijn(boundLetters []string, nextletter LamVar) string {
 	// First make the first character undefined (for now)
-	newLetter := intToLetter(nextletter)
+	newLetter := varToLetter(nextletter)
 	nextletter++
 
 	boundLetters = append([]string{newLetter}, boundLetters...)
 	result := "λ" + newLetter + "."
 
-	lx := LamExpr(lf)
+	lx := LamExpr(la)
 	result += lx.deDeBruijn(boundLetters, nextletter)
 
 	return result
+}
+
+// String returns the lambda variable as a string
+func (lv LamVar) String() string {
+	return LamExpr{lv}.String()
+}
+
+func (lv LamVar) deDeBruijn(boundLetters []string, nextletter LamVar) string {
+	return LamExpr{lv}.deDeBruijn(boundLetters, nextletter)
 }

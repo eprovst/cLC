@@ -1,13 +1,14 @@
 package LamCalc
 
+// TODO: Use the fact that LamVar is a LamTerm more in the source
+
 // LamTerm is a general type to represent both LamExprns and LamAbsts
 type LamTerm interface {
-	// Allow us to manipulate it as a list
-	len() int
-	index(int) interface{}
-
 	// alphaequivalence.go
 	alphaEquivalent(LamTerm) bool
+
+	// betareduction.go
+	substitute(LamVar, LamTerm) LamTerm
 
 	// etareduction.go
 	etaReduce() LamTerm
@@ -17,7 +18,7 @@ type LamTerm interface {
 
 	// stringify.go
 	String() string
-	deDeBruijn(boundLetters []string, nextletter int) string
+	deDeBruijn(boundLetters []string, nextletter LamVar) string
 
 	// simplify.go
 	Simplify() LamTerm
@@ -28,26 +29,11 @@ type LamTerm interface {
 	reduceOnce() LamTerm
 }
 
-// LamExpr is a list of LamAbsts, lamexprns and De Bruijn indexes (all lowered by one) which isn't an abstraction itself.
-type LamExpr []interface{}
+// LamExpr is a list of LamAbstns, LamExprns and De Bruijn indexes (all lowered by one) which isn't an abstraction itself.
+type LamExpr []LamTerm
 
-// Utils for LamExpr
-func (lx LamExpr) len() int {
-	return len(lx)
-}
+// LamAbst is a list of LamAbstns, LamExprns and De Bruijn indexes (all lowered by one)
+type LamAbst []LamTerm
 
-func (lx LamExpr) index(i int) interface{} {
-	return lx[i]
-}
-
-// LamAbst is a list of LamAbsts, lamexprns and De Bruijn indexes (all lowered by one)
-type LamAbst []interface{}
-
-// Utils for LamAbst
-func (lf LamAbst) len() int {
-	return len(lf)
-}
-
-func (lf LamAbst) index(i int) interface{} {
-	return lf[i]
-}
+// LamVar is a bound variable
+type LamVar uint
