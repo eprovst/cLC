@@ -13,14 +13,17 @@ var MaxReductions = 10000
 func (lx LamExpr) reduceOnce() LamTerm {
 	nw := LamExpr{}
 
-	if len(lx) >= 2 && reflect.TypeOf(lx[0]).String() == "LamCalc.LamAbst" {
-		nw = append(nw, lx[0].(LamAbst).betaReduce(lx[1]))
+	switch fst := lx[0].(type) {
+	case LamAbst:
+		if len(lx) >= 2 {
+			nw = append(nw, fst.betaReduce(lx[1]))
 
-		if len(lx) > 2 {
-			nw = append(nw, lx[2:]...)
+			if len(lx) > 2 {
+				nw = append(nw, lx[2:]...)
+			}
+
+			return nw
 		}
-
-		return nw
 	}
 
 	for _, term := range lx {
@@ -31,7 +34,26 @@ func (lx LamExpr) reduceOnce() LamTerm {
 }
 
 func (la LamAbst) reduceOnce() LamTerm {
-	return LamAbst{LamExpr(la).reduceOnce()}
+	nw := LamAbst{}
+
+	switch fst := la[0].(type) {
+	case LamAbst:
+		if len(la) >= 2 {
+			nw = append(nw, fst.betaReduce(la[1]))
+
+			if len(la) > 2 {
+				nw = append(nw, la[2:]...)
+			}
+
+			return nw
+		}
+	}
+
+	for _, term := range la {
+		nw = append(nw, term.reduceOnce())
+	}
+
+	return nw
 }
 
 func (lv LamVar) reduceOnce() LamTerm {

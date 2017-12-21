@@ -1,13 +1,14 @@
 package LamCalc
 
-import "reflect"
-
 // Simplify (tries) to remove unnecessary brackets
 func (lx LamExpr) Simplify() LamTerm {
 	if len(lx) == 1 {
 		return lx[0].Simplify()
 
-	} else if reflect.TypeOf(lx[0]).String() == "LamCalc.LamExpr" {
+	}
+
+	switch lx[0].(type) {
+	case LamExpr:
 		res := lx[0].(LamExpr)
 
 		if len(lx) > 1 {

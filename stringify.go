@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func varToLetter(num LamVar) string {
+func intToLetter(num int) string {
 	if num < 3 {
 		// x, y, z
 		return string(rune(120 + num - 0))
@@ -20,15 +20,15 @@ func varToLetter(num LamVar) string {
 	}
 
 	// x1, x2, x3...
-	return "x" + strconv.Itoa(int(num)-25)
+	return "x" + strconv.Itoa(num-25)
 }
 
 // String returns the Lambda Expression as a string
 func (lx LamExpr) String() string {
-	return lx.deDeBruijn([]string{}, 0)
+	return lx.deDeBruijn([]string{}, new(int))
 }
 
-func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter LamVar) string {
+func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter *int) string {
 	result := ""
 
 	for _, part := range lx {
@@ -53,13 +53,13 @@ func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter LamVar) string {
 
 // String returns the lambda abstraction as a string
 func (la LamAbst) String() string {
-	return la.deDeBruijn([]string{}, LamVar(0))
+	return la.deDeBruijn([]string{}, new(int))
 }
 
-func (la LamAbst) deDeBruijn(boundLetters []string, nextletter LamVar) string {
+func (la LamAbst) deDeBruijn(boundLetters []string, nextletter *int) string {
 	// First make the first character undefined (for now)
-	newLetter := varToLetter(nextletter)
-	nextletter++
+	newLetter := intToLetter(*nextletter)
+	*nextletter++
 
 	boundLetters = append([]string{newLetter}, boundLetters...)
 	result := "λ" + newLetter + "."
@@ -72,16 +72,16 @@ func (la LamAbst) deDeBruijn(boundLetters []string, nextletter LamVar) string {
 
 // String returns the lambda variable as a string
 func (lv LamVar) String() string {
-	return lv.deDeBruijn([]string{}, LamVar(0))
+	return lv.deDeBruijn([]string{}, new(int))
 }
 
-func (lv LamVar) deDeBruijn(boundLetters []string, nextletter LamVar) string {
+func (lv LamVar) deDeBruijn(boundLetters []string, nextletter *int) string {
 	if lv < LamVar(len(boundLetters)) && boundLetters[lv] != "" {
 		return boundLetters[lv]
 	}
 
-	newLetter := varToLetter(nextletter)
-	nextletter++
+	newLetter := intToLetter(*nextletter)
+	*nextletter++
 
 	for i := LamVar(len(boundLetters)); i < lv; i++ {
 		boundLetters = append(boundLetters, "")

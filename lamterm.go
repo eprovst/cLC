@@ -17,7 +17,7 @@ type LamTerm interface {
 
 	// stringify.go
 	String() string
-	deDeBruijn(boundLetters []string, nextletter LamVar) string
+	deDeBruijn(boundLetters []string, nextletter *int) string
 
 	// simplify.go
 	Simplify() LamTerm
