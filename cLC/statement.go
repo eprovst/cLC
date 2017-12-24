@@ -41,7 +41,7 @@ func executeStatement(stmnt cLCStatement) {
 		lx, err := stmnt.parameters[1].(LamCalc.LamTerm).Reduce()
 
 		if err != nil {
-			printError(err)
+			printError(err, "let with "+stmnt.parameters[1].(LamCalc.LamTerm).String())
 			return
 		}
 
@@ -49,7 +49,7 @@ func executeStatement(stmnt cLCStatement) {
 		la, err := lx.WHNFReduce()
 
 		if err != nil {
-			printError(err)
+			printError(err, "let with "+stmnt.parameters[1].(LamCalc.LamTerm).String())
 			return
 		}
 
@@ -59,7 +59,7 @@ func executeStatement(stmnt cLCStatement) {
 		la, err := stmnt.parameters[1].(LamCalc.LamTerm).WHNFReduce()
 
 		if err != nil {
-			printError(err)
+			printError(err, "wlet with "+stmnt.parameters[1].(LamCalc.LamTerm).String())
 			return
 		}
 
@@ -69,7 +69,7 @@ func executeStatement(stmnt cLCStatement) {
 		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()
 
 		if err != nil {
-			printError(err)
+			printError(err, "fold with "+stmnt.parameters[0].(LamCalc.LamTerm).String())
 			return
 		}
 
@@ -96,7 +96,7 @@ func executeStatement(stmnt cLCStatement) {
 		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).WHNFReduce()
 
 		if err != nil {
-			printError(err)
+			printError(err, "weak "+stmnt.parameters[0].(LamCalc.LamTerm).String())
 			return
 		}
 
@@ -107,7 +107,7 @@ func executeStatement(stmnt cLCStatement) {
 		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()
 
 		if err != nil {
-			printError(err)
+			printError(err, stmnt.parameters[0].(LamCalc.LamTerm).String())
 			return
 		}
 
