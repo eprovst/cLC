@@ -11,8 +11,8 @@ import (
 func parseString(expr string, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
 	expr = strings.TrimSpace(expr)
 
-	// Support the lambda as well as the backslash
-	expr = strings.Replace(expr, "λ", "\\", -1)
+	// Backslash is a notation for lambda
+	expr = strings.Replace(expr, "\\", "λ", -1)
 
 	if len(expr) == 0 {
 		return LamCalc.LamExpr{}, errors.New("no expression present")
@@ -26,7 +26,7 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 
 	i := 0
 
-	if expr[i] == '\\' {
+	if expr[i] == 'λ' {
 		if len(expr) < 2 {
 			return term, errors.New("no local variable specified in abstraction")
 		}
@@ -51,8 +51,6 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 		}
 
 		if !isValidVariableName(avar) {
-			// Consistently show λ's in output
-			avar = strings.Replace(avar, "\\", "λ", -1)
 			return term, errors.New("invalid variable name '" + avar + "'")
 
 		} else if i >= len(expr)-1 {
@@ -70,7 +68,7 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 
 	for ; i < len(expr); i++ {
 		switch expr[i] {
-		case '\\':
+		case 'λ':
 			// Start of abstraction, the rest of the expression is part of it
 			part, err := furtherParseString(expr[i:], boundVars, globals)
 			i = len(expr)
