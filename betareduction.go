@@ -7,7 +7,7 @@ func (lx LamExpr) substitute(index LamVar, sub LamTerm) LamTerm {
 	for _, term := range lx {
 		switch term := term.(type) {
 		case LamAbst:
-			nw = append(nw, term.substitute(index+1, shiftIndex(1, 0, sub)))
+			nw = append(nw, term.substitute(index+1, heightenIndex(sub)))
 
 		default:
 			nw = append(nw, term.substitute(index, sub))
@@ -24,7 +24,7 @@ func (la LamAbst) substitute(index LamVar, sub LamTerm) LamTerm {
 	for _, term := range la {
 		switch term := term.(type) {
 		case LamAbst:
-			nw = append(nw, term.substitute(index+1, shiftIndex(1, 0, sub)))
+			nw = append(nw, term.substitute(index+1, heightenIndex(sub)))
 
 		default:
 			nw = append(nw, term.substitute(index, sub))
@@ -44,6 +44,8 @@ func (lv LamVar) substitute(index LamVar, sub LamTerm) LamTerm {
 }
 
 // betaReduce replaces index 0 by sub and returns a LamExpr
-func (la LamAbst) betaReduce(sub LamTerm) LamExpr {
-	return shiftIndex(-1, 1, LamExpr(la).substitute(0, shiftIndex(1, 0, sub))).(LamExpr)
+func (la LamAbst) betaReduce(sub LamTerm) LamTerm {
+	return lowerIndex(
+		LamExpr(la).substitute(0, heightenIndex(sub)),
+	)
 }

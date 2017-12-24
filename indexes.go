@@ -1,5 +1,15 @@
 package LamCalc
 
+// heightenIndex heightens the De Bruijn indexes by one where needed
+func heightenIndex(expr LamTerm) LamTerm {
+	return shiftIndex(1, 0, expr)
+}
+
+// lowerIndex lowers the De Bruijn indexes by one where needed
+func lowerIndex(expr LamTerm) LamTerm {
+	return shiftIndex(-1, 1, expr)
+}
+
 // shiftIndex is used to correct the De Bruijn indexes
 func shiftIndex(correction int, cutoff int, expr LamTerm) LamTerm {
 	switch expr := expr.(type) {

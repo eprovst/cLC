@@ -76,14 +76,14 @@ func (lv LamVar) String() string {
 }
 
 func (lv LamVar) deDeBruijn(boundLetters []string, nextletter *int) string {
-	if lv < LamVar(len(boundLetters)) && boundLetters[lv] != "" {
+	if int(lv) < len(boundLetters) && boundLetters[lv] != "" {
 		return boundLetters[lv]
 	}
 
 	newLetter := intToLetter(*nextletter)
 	*nextletter++
 
-	for i := LamVar(len(boundLetters)); i < lv; i++ {
+	for i := len(boundLetters); i < int(lv); i++ {
 		boundLetters = append(boundLetters, "")
 	}
 
