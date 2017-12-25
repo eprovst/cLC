@@ -12,13 +12,14 @@ type LamTerm interface {
 	Equivalent(LamTerm) bool
 
 	String() string
-	deDeBruijn(boundLetters []string, nextletter *int) string
+	deDeBruijn(boundLetters *[]string, nextletter *int) string
 
 	Simplify() LamTerm
 
 	Reduce() (LamTerm, error)
-	WHNFReduce() (LamAbst, error)
 	reduceOnce() LamTerm
+
+	WHNF() LamAbst
 }
 
 // LamExpr is a list of LamAbstns, LamExprns and De Bruijn indexes (all lowered by one) which isn't an abstraction itself.

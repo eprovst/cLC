@@ -46,23 +46,12 @@ func executeStatement(stmnt cLCStatement) {
 		}
 
 		// Make sure it's a function
-		la, err := lx.WHNFReduce()
-
-		if err != nil {
-			printError(err, "let with "+stmnt.parameters[1].(LamCalc.LamTerm).String())
-			return
-		}
+		la := lx.WHNF()
 
 		globals[stmnt.parameters[0].(string)] = la
 
 	case "wlet":
-		la, err := stmnt.parameters[1].(LamCalc.LamTerm).WHNFReduce()
-
-		if err != nil {
-			printError(err, "wlet with "+stmnt.parameters[1].(LamCalc.LamTerm).String())
-			return
-		}
-
+		la := stmnt.parameters[1].(LamCalc.LamTerm).WHNF()
 		globals[stmnt.parameters[0].(string)] = la
 
 	case "fold":
@@ -93,12 +82,7 @@ func executeStatement(stmnt cLCStatement) {
 		loadFiles(stmnt.parameters[0].([]string))
 
 	case "weak":
-		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).WHNFReduce()
-
-		if err != nil {
-			printError(err, "weak "+stmnt.parameters[0].(LamCalc.LamTerm).String())
-			return
-		}
+		expression := stmnt.parameters[0].(LamCalc.LamTerm).WHNF()
 
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n\n")
 		fmt.Print("    " + expression.String() + "\n\n")

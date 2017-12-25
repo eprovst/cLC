@@ -1,0 +1,6 @@
+-- This file implements Haskell Curry's BCKW combinatory logic
+
+let B = λx.λy.λz.x (y z)
+let C = λx.λy.λz.x z y
+let K = λx.λy.x
+let W = λx.λy.x y y

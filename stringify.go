@@ -25,10 +25,10 @@ func intToLetter(num int) string {
 
 // String returns the Lambda Expression as a string
 func (lx LamExpr) String() string {
-	return lx.deDeBruijn([]string{}, new(int))
+	return lx.deDeBruijn(new([]string), new(int))
 }
 
-func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter *int) string {
+func (lx LamExpr) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 	result := ""
 
 	for _, part := range lx {
@@ -53,40 +53,49 @@ func (lx LamExpr) deDeBruijn(boundLetters []string, nextletter *int) string {
 
 // String returns the lambda abstraction as a string
 func (la LamAbst) String() string {
-	return la.deDeBruijn([]string{}, new(int))
+	return la.deDeBruijn(new([]string), new(int))
 }
 
-func (la LamAbst) deDeBruijn(boundLetters []string, nextletter *int) string {
+func (la LamAbst) deDeBruijn(boundLetters *[]string, nextletter *int) string {
+	// Remember at which character we were
+	oldNextLetter := *nextletter
+
 	// First make the first character undefined (for now)
 	newLetter := intToLetter(*nextletter)
 	*nextletter++
 
-	boundLetters = append([]string{newLetter}, boundLetters...)
+	// Make a copy of the bound letters to contain locally defined variables
+	nwBoundLetters := new([]string)
+	*nwBoundLetters = append(*nwBoundLetters, newLetter)
+	*nwBoundLetters = append(*nwBoundLetters, *boundLetters...)
+
 	result := "λ" + newLetter + "."
 
 	lx := LamExpr(la)
-	result += lx.deDeBruijn(boundLetters, nextletter)
+	result += lx.deDeBruijn(nwBoundLetters, nextletter)
 
+	// Reset our local naming
+	*nextletter = oldNextLetter
 	return result
 }
 
 // String returns the lambda variable as a string
 func (lv LamVar) String() string {
-	return lv.deDeBruijn([]string{}, new(int))
+	return lv.deDeBruijn(new([]string), new(int))
 }
 
-func (lv LamVar) deDeBruijn(boundLetters []string, nextletter *int) string {
-	if int(lv) < len(boundLetters) && boundLetters[lv] != "" {
-		return boundLetters[lv]
+func (lv LamVar) deDeBruijn(boundLetters *[]string, nextletter *int) string {
+	if int(lv) < len(*boundLetters) && (*boundLetters)[lv] != "" {
+		return (*boundLetters)[lv]
 	}
 
 	newLetter := intToLetter(*nextletter)
 	*nextletter++
 
-	for i := len(boundLetters); i < int(lv); i++ {
-		boundLetters = append(boundLetters, "")
+	for i := len(*boundLetters); i < int(lv); i++ {
+		*boundLetters = append(*boundLetters, "")
 	}
 
-	boundLetters = append(boundLetters, newLetter)
+	*boundLetters = append(*boundLetters, newLetter)
 	return newLetter
 }
