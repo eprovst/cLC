@@ -22,6 +22,9 @@ func executeStatement(stmnt cLCStatement) {
 	case "exit":
 		os.Exit(0)
 
+	case "help":
+		showHelp()
+
 	case "clear":
 		var clearCmd *exec.Cmd
 

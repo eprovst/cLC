@@ -26,6 +26,9 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 	case "info":
 		return cLCStatement{command: "info"}, nil
 
+	case "help":
+		return cLCStatement{command: "help"}, nil
+
 	case "let":
 		stmnt = strings.TrimPrefix(stmnt, "let")
 		splitStmnt := strings.SplitAfter(stmnt, "=")
