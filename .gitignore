@@ -1,6 +1,9 @@
 # Editor
 .vscode/
 
+# Build folders
+build/
+
 # Binaries for programs and plugins
 *.exe
 *.dll

@@ -60,7 +60,7 @@ func showHelp() {
 Help:
 -----
 
-For full details: visit the wiki on the project page.
+For full details: visit the project's wiki.
 
 Availabe commands:
 
