@@ -7,14 +7,8 @@ import (
 	"strings"
 )
 
-func printError(err error, location string) {
-	fmt.Print("Error: " + err.Error())
-
-	if location != "" {
-		fmt.Print(" in " + location)
-	}
-
-	fmt.Println()
+func printError(err error) {
+	fmt.Println("Error: " + err.Error())
 }
 
 func loadFiles(paths []string) {
@@ -22,7 +16,7 @@ func loadFiles(paths []string) {
 		file, err := os.Open(filePath)
 
 		if err != nil {
-			printError(err, "")
+			printError(err)
 
 		} else {
 			fileScanner := bufio.NewScanner(file)
@@ -32,7 +26,7 @@ func loadFiles(paths []string) {
 				stmnt, err := parseStatement(command)
 
 				if err != nil {
-					printError(err, "")
+					printError(err)
 				} else {
 					executeStatement(stmnt)
 				}

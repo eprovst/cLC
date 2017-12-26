@@ -31,7 +31,7 @@ func main() {
 		stmnt, err := parseStatement(command)
 
 		if err != nil {
-			printError(err, "")
+			printError(err)
 		} else {
 			executeStatement(stmnt)
 		}

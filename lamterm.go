@@ -17,7 +17,9 @@ type LamTerm interface {
 	Simplify() LamTerm
 
 	Reduce() (LamTerm, error)
-	reduceOnce() LamTerm
+
+	NorReduce() (LamTerm, error)
+	norReduceOnce() LamTerm
 
 	WHNF() LamAbst
 }

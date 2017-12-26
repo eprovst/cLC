@@ -22,5 +22,5 @@ func (la LamAbst) WHNF() LamAbst {
 
 // WHNF encapsulates the Lambda variable inside of a lambda abstraction
 func (lv LamVar) WHNF() LamAbst {
-	return LamAbst{lv, LamVar(0)}
+	return LamAbst{heightenIndex(lv), LamVar(0)}
 }

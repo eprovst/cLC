@@ -60,21 +60,18 @@ func (la LamAbst) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 	// Remember at which character we were
 	oldNextLetter := *nextletter
 
-	// First make the first character undefined (for now)
+	// Add the localy bound letter to the list
 	newLetter := intToLetter(*nextletter)
 	*nextletter++
-
-	// Make a copy of the bound letters to contain locally defined variables
-	nwBoundLetters := new([]string)
-	*nwBoundLetters = append(*nwBoundLetters, newLetter)
-	*nwBoundLetters = append(*nwBoundLetters, *boundLetters...)
+	*boundLetters = append([]string{newLetter}, *boundLetters...)
 
 	result := "λ" + newLetter + "."
 
 	lx := LamExpr(la)
-	result += lx.deDeBruijn(nwBoundLetters, nextletter)
+	result += lx.deDeBruijn(boundLetters, nextletter)
 
-	// Reset our local naming
+	// Remove our local naming
+	*boundLetters = (*boundLetters)[1:]
 	*nextletter = oldNextLetter
 	return result
 }
