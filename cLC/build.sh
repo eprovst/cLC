@@ -9,11 +9,6 @@ go build -o build/current/cLC
 cp build/current/cLC build/current/cLC.exe
 
 # Build for 64bit Linux and Windows
-GOARCH=amd64
+GOARCH=amd64 GOOS=linux go build -o build/linux/cLC
 
-GOOS=linux
-go build -o build/linux/cLC
-
-GOOS=windows
-go build -o build/windows/cLC.exe
-
+GOARCH=amd64 GOOS=windows go build -o build/windows/cLC.exe
