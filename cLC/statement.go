@@ -41,7 +41,7 @@ func executeStatement(stmnt cLCStatement) {
 		showInfo()
 
 	case "let":
-		lx, err := stmnt.parameters[1].(LamCalc.LamTerm).Reduce()
+		lx, err := stmnt.parameters[1].(LamCalc.Term).Reduce()
 
 		if err != nil {
 			printError(err)
@@ -54,18 +54,18 @@ func executeStatement(stmnt cLCStatement) {
 		globals[stmnt.parameters[0].(string)] = la
 
 	case "wlet":
-		la := stmnt.parameters[1].(LamCalc.LamTerm).WHNF()
+		la := stmnt.parameters[1].(LamCalc.Term).WHNF()
 		globals[stmnt.parameters[0].(string)] = la
 
 	case "fold":
-		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()
+		expression, err := stmnt.parameters[0].(LamCalc.Term).Reduce()
 
 		if err != nil {
 			printError(err)
 			return
 		}
 
-		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n")
+		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n")
 
 		couldFold := false
 		for _, gvar := range stmnt.parameters[1].([]string) {
@@ -85,20 +85,20 @@ func executeStatement(stmnt cLCStatement) {
 		loadFiles(stmnt.parameters[0].([]string))
 
 	case "weak":
-		expression := stmnt.parameters[0].(LamCalc.LamTerm).WHNF()
+		expression := stmnt.parameters[0].(LamCalc.Term).WHNF()
 
-		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n\n")
+		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n\n")
 		fmt.Print("    " + expression.String() + "\n\n")
 
 	case "show":
-		expression, err := stmnt.parameters[0].(LamCalc.LamTerm).Reduce()
+		expression, err := stmnt.parameters[0].(LamCalc.Term).Reduce()
 
 		if err != nil {
 			printError(err)
 			return
 		}
 
-		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.LamTerm).String() + " =\n\n")
+		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n\n")
 		fmt.Print("    " + expression.String() + "\n\n")
 	}
 }

@@ -1,39 +1,37 @@
 package LamCalc
 
 // heightenIndex heightens the De Bruijn indexes by one where needed
-func heightenIndex(expr LamTerm) LamTerm {
+func heightenIndex(expr Term) Term {
 	return shiftIndex(1, 0, expr)
 }
 
 // lowerIndex lowers the De Bruijn indexes by one where needed
-func lowerIndex(expr LamTerm) LamTerm {
+func lowerIndex(expr Term) Term {
 	return shiftIndex(-1, 1, expr)
 }
 
 // shiftIndex is used to correct the De Bruijn indexes
-func shiftIndex(correction int, cutoff int, expr LamTerm) LamTerm {
+func shiftIndex(correction int, cutoff int, expr Term) Term {
 	switch expr := expr.(type) {
-	case LamVar:
+	case Var:
 		if int(expr) >= cutoff {
-			return expr + LamVar(correction)
+			return expr + Var(correction)
 		}
 
 		return expr
 
-	case LamAbst:
-		res := LamAbst{}
+	case Abst:
+		res := Abst{}
 
-		for _, term := range expr {
-			res = append(res, shiftIndex(correction, cutoff+1, term))
-		}
+		res[0] = shiftIndex(correction, cutoff+1, expr[0])
 
 		return res
 
 	default:
-		res := LamExpr{}
+		res := Appl{}
 
-		for _, term := range expr.(LamExpr) {
-			res = append(res, shiftIndex(correction, cutoff, term))
+		for i, term := range expr.(Appl) {
+			res[i] = shiftIndex(correction, cutoff, term)
 		}
 
 		return res

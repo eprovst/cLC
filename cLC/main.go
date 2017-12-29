@@ -8,14 +8,14 @@ import (
 	"github.com/chzyer/readline"
 )
 
-var globals = map[string]LamCalc.LamAbst{}
+var globals = map[string]LamCalc.Abst{}
 
 func main() {
 	// A warm welcome
 	showInfo()
 
 	// Limited the amount of time we wait for computation to finish
-	LamCalc.MaxReductions = 2500
+	LamCalc.MaxReductions = 5000
 
 	// Load files
 	if len(os.Args) > 1 {

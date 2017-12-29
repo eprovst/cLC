@@ -7,15 +7,15 @@ import (
 	"github.com/ElecProg/LamCalc"
 )
 
-// parseString turns the input into a LamTerm
-func parseString(expr string, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
+// parseString turns the input into a Term
+func parseString(expr string, globals map[string]LamCalc.Abst) (LamCalc.Term, error) {
 	// Backslash is a notation for lambda
 	expr = strings.Replace(expr, "\\", "λ", -1)
 
-	return furtherParseString([]rune(expr), map[string]LamCalc.LamVar{}, globals)
+	return furtherParseString([]rune(expr), map[string]LamCalc.Var{}, globals)
 }
 
-func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, globals map[string]LamCalc.LamAbst) (LamCalc.LamTerm, error) {
+func furtherParseString(expr []rune, boundVars map[string]LamCalc.Var, globals map[string]LamCalc.Abst) (LamCalc.Term, error) {
 	// Clean string
 	expr = []rune(strings.TrimSpace(string(expr)))
 
@@ -23,18 +23,17 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 		return nil, errors.New("empty expression")
 
 	} else if expr[0] == 'λ' {
-		term := LamCalc.LamAbst{}
 		i := 0
 
 		if len(expr) < 2 {
-			return term, errors.New("no local variable specified in abstraction")
+			return nil, errors.New("no local variable specified in abstraction")
 		}
 
 		i++
 
 		// Create copy of boundVars where every index is one higher
 		oldVars := boundVars
-		boundVars = map[string]LamCalc.LamVar{}
+		boundVars = map[string]LamCalc.Var{}
 
 		// First increment the index of each bound variable
 		for variable := range oldVars {
@@ -49,10 +48,10 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 		}
 
 		if !isValidVariableName(avar) {
-			return term, errors.New("invalid variable name '" + avar + "'")
+			return nil, errors.New("invalid variable name '" + avar + "'")
 
 		} else if i >= len(expr)-1 {
-			return term, errors.New("abstraction body not started")
+			return nil, errors.New("abstraction body not started")
 		}
 
 		i++ // Skip the .
@@ -67,10 +66,10 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 			return nil, err
 		}
 
-		return append(term, part), nil
+		return LamCalc.Abst{part}, nil
 	}
 
-	term := LamCalc.LamExpr{}
+	term := LamCalc.Appl{}
 
 	for i := 0; i < len(expr); i++ {
 		switch expr[i] {
@@ -83,10 +82,10 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 				return nil, err
 			}
 
-			term = append(term, part)
+			term[1] = part
 
 		case '(':
-			var cterm LamCalc.LamTerm
+			var cterm LamCalc.Term
 
 			i++
 			starte := i
@@ -110,7 +109,7 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 				return nil, err
 			}
 
-			term = append(term, cterm)
+			term[1] = cterm
 
 		case '\t':
 			// Skip tabs
@@ -138,24 +137,29 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.LamVar, global
 			cindex, ok := boundVars[cvar]
 
 			if ok {
-				term = append(term, cindex)
+				term[1] = cindex
 			} else {
 				cfnc, ok := globals[cvar]
 				if ok {
-					term = append(term, cfnc)
+					term[1] = cfnc
 				} else {
 					return nil, errors.New("'" + cvar + "' not yet defined")
 				}
 			}
 		}
 
-		// If the LamExpr is full: encapsulate it in a new one
-		if len(term) == 2 {
-			term = LamCalc.LamExpr{term}
+		// If the Appl is full: encapsulate it in a new one
+		if term[1] != nil {
+			if term[0] == nil { // First term wasn't added (happens after first element)
+				term = LamCalc.Appl{term[1]}
+
+			} else {
+				term = LamCalc.Appl{term}
+			}
 		}
 	}
 
-	// We build the LamExpr so that there is always one empty spot on the right,
+	// We build the Appl so that there is always one empty spot on the right,
 	// thus we only return the first element
 	return term[0], nil
 }

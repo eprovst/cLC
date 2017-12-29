@@ -24,27 +24,28 @@ func intToLetter(num int) string {
 }
 
 // String returns the Lambda Expression as a string
-func (lx LamExpr) String() string {
+func (lx Appl) String() string {
 	return lx.deDeBruijn(new([]string), new(int))
 }
 
-func (lx LamExpr) deDeBruijn(boundLetters *[]string, nextletter *int) string {
+func (lx Appl) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 	result := ""
 
-	for _, part := range lx {
+	for i, part := range lx {
 		switch part := part.(type) {
-		case LamVar:
+		case Var:
 			result += part.deDeBruijn(boundLetters, nextletter) + " "
 
-		case LamAbst:
-			if len(lx) == 1 {
-				result += part.deDeBruijn(boundLetters, nextletter)
+		case Abst:
+			result += "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
+
+		case Appl:
+			if i == 0 {
+				result += part.deDeBruijn(boundLetters, nextletter) + " "
+
 			} else {
 				result += "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
 			}
-
-		case LamExpr:
-			result += "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
 		}
 	}
 
@@ -52,11 +53,11 @@ func (lx LamExpr) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 }
 
 // String returns the lambda abstraction as a string
-func (la LamAbst) String() string {
+func (la Abst) String() string {
 	return la.deDeBruijn(new([]string), new(int))
 }
 
-func (la LamAbst) deDeBruijn(boundLetters *[]string, nextletter *int) string {
+func (la Abst) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 	// Remember at which character we were
 	oldNextLetter := *nextletter
 
@@ -66,9 +67,7 @@ func (la LamAbst) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 	*boundLetters = append([]string{newLetter}, *boundLetters...)
 
 	result := "λ" + newLetter + "."
-
-	lx := LamExpr(la)
-	result += lx.deDeBruijn(boundLetters, nextletter)
+	result += la[0].deDeBruijn(boundLetters, nextletter)
 
 	// Remove our local naming
 	*boundLetters = (*boundLetters)[1:]
@@ -77,11 +76,11 @@ func (la LamAbst) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 }
 
 // String returns the lambda variable as a string
-func (lv LamVar) String() string {
+func (lv Var) String() string {
 	return lv.deDeBruijn(new([]string), new(int))
 }
 
-func (lv LamVar) deDeBruijn(boundLetters *[]string, nextletter *int) string {
+func (lv Var) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 	if int(lv) < len(*boundLetters) && (*boundLetters)[lv] != "" {
 		return (*boundLetters)[lv]
 	}

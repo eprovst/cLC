@@ -1,41 +1,23 @@
 package LamCalc
 
 // substitute replaces index by sub
-func (lx LamExpr) substitute(index LamVar, sub LamTerm) LamTerm {
-	nw := LamExpr{}
+func (lx Appl) substitute(index Var, sub Term) Term {
+	nw := Appl{}
 
-	for _, term := range lx {
-		switch term := term.(type) {
-		case LamAbst:
-			nw = append(nw, term.substitute(index+1, heightenIndex(sub)))
-
-		default:
-			nw = append(nw, term.substitute(index, sub))
-		}
+	for i := range lx {
+		nw[i] = lx[i].substitute(index, sub)
 	}
 
 	return nw
 }
 
 // substitute replaces index by sub
-func (la LamAbst) substitute(index LamVar, sub LamTerm) LamTerm {
-	nw := LamAbst{}
-
-	for _, term := range la {
-		switch term := term.(type) {
-		case LamAbst:
-			nw = append(nw, term.substitute(index+1, heightenIndex(sub)))
-
-		default:
-			nw = append(nw, term.substitute(index, sub))
-		}
-	}
-
-	return nw
+func (la Abst) substitute(index Var, sub Term) Term {
+	return Abst{la[0].substitute(index+1, heightenIndex(sub))}
 }
 
 // substitute replaces index by sub
-func (lv LamVar) substitute(index LamVar, sub LamTerm) LamTerm {
+func (lv Var) substitute(index Var, sub Term) Term {
 	if lv == index {
 		return sub
 	}
@@ -43,9 +25,9 @@ func (lv LamVar) substitute(index LamVar, sub LamTerm) LamTerm {
 	return lv
 }
 
-// betaReduce replaces index 0 by sub and returns a LamExpr
-func (la LamAbst) betaReduce(sub LamTerm) LamTerm {
+// betaReduce replaces index 0 by sub and returns a Appl
+func (la Abst) betaReduce(sub Term) Term {
 	return lowerIndex(
-		LamExpr(la).substitute(0, heightenIndex(sub)),
+		la[0].substitute(0, heightenIndex(sub)),
 	)
 }

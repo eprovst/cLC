@@ -74,16 +74,16 @@ fold <lambda expression> into <global1> <global2> <...>
 → Tries to fully expand the expression and then shows the first listed global which is equivalent to that reduction.
 
 weak <lambda expression>
-→ Tries to expand the expression to a weak head normal form then shows the result, useful for expressions which wouldn't terminate reducing otherwise.
+→ Transforms the expression to a weak head normal form, then shows the result. Useful for expressions which wouldn't terminate reducing otherwise.
 
 wlet <new global> = <lambda expression>
-→ Equivalent to let but only reduces the expression to a weak head normal form.
+→ Equivalent to let but only transforms the expression to a weak head normal form.
 
 <command> -- <comment>
 → Everything after -- is ignored.
 
 help
-→ Shows this list.
+→ Shows help for the cLC.
 
 clear
 → Clears the terminal.

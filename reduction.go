@@ -5,16 +5,16 @@ package LamCalc
 var MaxReductions = 10000
 
 // Reduce reduces a lambda expression using normal order
-func (lx LamExpr) Reduce() (LamTerm, error) {
+func (lx Appl) Reduce() (Term, error) {
 	return lx.NorReduce()
 }
 
 // Reduce reduces a lambda abstraction using normal order
-func (la LamAbst) Reduce() (LamTerm, error) {
+func (la Abst) Reduce() (Term, error) {
 	return la.NorReduce()
 }
 
 // Reduce returns the variable itself
-func (lv LamVar) Reduce() (LamTerm, error) {
+func (lv Var) Reduce() (Term, error) {
 	return lv.NorReduce()
 }

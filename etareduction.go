@@ -1,75 +1,50 @@
 package LamCalc
 
-func (lx LamExpr) containsVar(idx LamVar) bool {
-	for _, term := range lx {
-		switch term := term.(type) {
-		case LamAbst:
-			if term.containsVar(idx + 1) {
-				return true
-			}
-
-		default:
-			if term.containsVar(idx) {
-				return true
-			}
+func (lx Appl) containsVar(idx Var) bool {
+	for i := range lx {
+		if lx[i].containsVar(idx) {
+			return true
 		}
 	}
 
 	return false
 }
 
-func (la LamAbst) containsVar(idx LamVar) bool {
-	for _, term := range la {
-		switch term := term.(type) {
-		case LamAbst:
-			if term.containsVar(idx + 1) {
-				return true
-			}
-
-		default:
-			if term.containsVar(idx) {
-				return true
-			}
-		}
+func (la Abst) containsVar(idx Var) bool {
+	if la[0].containsVar(idx + 1) {
+		return true
 	}
 
 	return false
 }
 
-func (lv LamVar) containsVar(idx LamVar) bool {
+func (lv Var) containsVar(idx Var) bool {
 	return lv == idx
 }
 
-func (la LamAbst) etaReduce() LamTerm {
-	last := la[len(la)-1]
-
-	if len(la) >= 2 && last == LamVar(0) {
-		if !LamExpr(la[:len(la)-1]).containsVar(0) {
+func (la Abst) etaReduce() Term {
+	switch body := la[0].(type) {
+	case Appl:
+		if body[1] == Var(0) && !body[0].containsVar(0) {
 			// Index zero was not used anywhere else: do eta reduction
-			return shiftIndex(-1, 1, LamExpr(la[:len(la)-1])).etaReduce()
+			return shiftIndex(-1, 1, body[0].etaReduce())
 		}
 	}
 
-	// If zero exists it had significance: no eta reduction at this level
-	nw := LamAbst{}
+	// Else we can't do etareduction
+	return Abst{la[0].etaReduce()}
+}
 
-	for _, term := range la {
-		nw = append(nw, term.etaReduce())
+func (lx Appl) etaReduce() Term {
+	nw := Appl{}
+
+	for i, term := range lx {
+		nw[i] = term.etaReduce()
 	}
 
 	return nw
 }
 
-func (lx LamExpr) etaReduce() LamTerm {
-	nw := LamExpr{}
-
-	for _, term := range lx {
-		nw = append(nw, term.etaReduce())
-	}
-
-	return nw
-}
-
-func (lv LamVar) etaReduce() LamTerm {
+func (lv Var) etaReduce() Term {
 	return lv
 }

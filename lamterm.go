@@ -1,34 +1,32 @@
 package LamCalc
 
-// LamTerm is a general type to represent both LamExprns and LamAbsts
-type LamTerm interface {
-	alphaEquivalent(LamTerm) bool
+// Term is a general type to represent both Applns and Absts
+type Term interface {
+	alphaEquivalent(Term) bool
 
-	substitute(LamVar, LamTerm) LamTerm
+	substitute(Var, Term) Term
 
-	containsVar(LamVar) bool
-	etaReduce() LamTerm
+	containsVar(Var) bool
+	etaReduce() Term
 
-	Equivalent(LamTerm) bool
+	Equivalent(Term) bool
 
 	String() string
 	deDeBruijn(boundLetters *[]string, nextletter *int) string
 
-	Simplify() LamTerm
+	Reduce() (Term, error)
 
-	Reduce() (LamTerm, error)
+	NorReduce() (Term, error)
+	norReduceOnce() Term
 
-	NorReduce() (LamTerm, error)
-	norReduceOnce() LamTerm
-
-	WHNF() LamAbst
+	WHNF() Abst
 }
 
-// LamExpr is a list of LamAbstns, LamExprns and De Bruijn indexes (all lowered by one) which isn't an abstraction itself.
-type LamExpr []LamTerm
+// Appl is a list of Abstns, Applns and De Bruijn indexes (all lowered by one) which isn't an abstraction itself.
+type Appl [2]Term
 
-// LamAbst is a list of LamAbstns, LamExprns and De Bruijn indexes (all lowered by one)
-type LamAbst []LamTerm
+// Abst is a list of Abstns, Applns and De Bruijn indexes (all lowered by one)
+type Abst [1]Term
 
-// LamVar is a variable
-type LamVar uint
+// Var is a variable
+type Var uint

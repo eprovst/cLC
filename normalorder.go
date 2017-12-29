@@ -5,93 +5,65 @@ import (
 )
 
 // NorReduce reduces a lambda expression using normal order
-func (lx LamExpr) NorReduce() (LamTerm, error) {
-	ls := lx.Simplify()
-	nw := ls.norReduceOnce().Simplify()
+func (lx Appl) NorReduce() (Term, error) {
+	var ls Term = lx
+	nw := ls.norReduceOnce()
 
 	for c := 0; !nw.alphaEquivalent(ls); c++ {
 		if c == MaxReductions {
-			return LamAbst{}, errors.New("exeeded maximum amount of reductions")
+			return nil, errors.New("exeeded maximum amount of reductions")
 		}
 
 		ls = nw
-		nw = nw.norReduceOnce().Simplify()
+		nw = nw.norReduceOnce()
 	}
 
-	return nw.etaReduce().Simplify(), nil
+	return nw.etaReduce(), nil
 }
 
-// norReduceOnce reduces a lambda expression once
-func (lx LamExpr) norReduceOnce() LamTerm {
-	nw := LamExpr{}
-
+// norReduceOnce reduces a lambda application once
+func (lx Appl) norReduceOnce() Term {
 	switch fst := lx[0].(type) {
-	case LamAbst:
-		if len(lx) >= 2 {
-			nw = append(nw, fst.betaReduce(lx[1]))
+	case Abst:
+		return fst.betaReduce(lx[1])
 
-			if len(lx) > 2 {
-				nw = append(nw, lx[2:]...)
-			}
+	case Var:
+		return Appl{lx[0], lx[1].norReduceOnce()}
 
-			return nw
-		}
+	default:
+		return Appl{lx[0].norReduceOnce(), lx[1]}
 	}
 
-	for _, term := range lx {
-		nw = append(nw, term.norReduceOnce())
-	}
-
-	return nw
 }
 
 // NorReduce reduces a lambda abstraction using normal order
-func (la LamAbst) NorReduce() (LamTerm, error) {
-	ls := la.Simplify()
-	nw := ls.norReduceOnce().Simplify()
+func (la Abst) NorReduce() (Term, error) {
+	var ls Term = la
+	nw := ls.norReduceOnce()
 
 	for c := 0; !nw.alphaEquivalent(ls); c++ {
 		if c == MaxReductions {
-			return LamAbst{}, errors.New("exeeded maximum amount of reductions")
+			return nil, errors.New("exeeded maximum amount of reductions")
 		}
 
 		ls = nw
-		nw = nw.norReduceOnce().Simplify()
+		nw = nw.norReduceOnce()
 	}
 
-	return nw.etaReduce().Simplify(), nil
+	return nw.etaReduce(), nil
 }
 
 // norReduceOnce reduces a lambda abstraction once
-func (la LamAbst) norReduceOnce() LamTerm {
-	nw := LamAbst{}
-
-	switch fst := la[0].(type) {
-	case LamAbst:
-		if len(la) >= 2 {
-			nw = append(nw, fst.betaReduce(la[1]))
-
-			if len(la) > 2 {
-				nw = append(nw, la[2:]...)
-			}
-
-			return nw
-		}
-	}
-
-	for _, term := range la {
-		nw = append(nw, term.norReduceOnce())
-	}
-
-	return nw
+func (la Abst) norReduceOnce() Term {
+	return Abst{la[0].norReduceOnce()}
 }
 
 // NorReduce returns the variable itself
-func (lv LamVar) NorReduce() (LamTerm, error) {
+func (lv Var) NorReduce() (Term, error) {
 	return lv, nil
 }
 
 // norReduceOnce reduces a lambda variable once
-func (lv LamVar) norReduceOnce() LamTerm {
+func (lv Var) norReduceOnce() Term {
 	return lv
 }

@@ -2,14 +2,10 @@ package LamCalc
 
 // As we are using De Bruijn indexes alphaEquivalence is the same as syntactic equivalence
 
-// Equals checks wether the LamExp is identical to a LamTerm
-func (lx LamExpr) alphaEquivalent(other LamTerm) bool {
+// Equals checks wether the LamExp is identical to a Term
+func (lx Appl) alphaEquivalent(other Term) bool {
 	switch other := other.(type) {
-	case LamExpr:
-		if len(lx) != len(other) {
-			return false
-		}
-
+	case Appl:
 		for i := range lx {
 			if !lx[i].alphaEquivalent(other[i]) {
 				return false
@@ -23,18 +19,12 @@ func (lx LamExpr) alphaEquivalent(other LamTerm) bool {
 	}
 }
 
-// Equals checks wether a LamAbst and a LamTerm are identical
-func (la LamAbst) alphaEquivalent(other LamTerm) bool {
+// Equals checks wether a Abst and a Term are identical
+func (la Abst) alphaEquivalent(other Term) bool {
 	switch other := other.(type) {
-	case LamAbst:
-		if len(la) != len(other) {
+	case Abst:
+		if !la[0].alphaEquivalent(other[0]) {
 			return false
-		}
-
-		for i := range la {
-			if !la[i].alphaEquivalent(other[i]) {
-				return false
-			}
 		}
 
 		return true
@@ -44,10 +34,10 @@ func (la LamAbst) alphaEquivalent(other LamTerm) bool {
 	}
 }
 
-// Equals checks wether a LamVar and a LamTerm are identical
-func (lv LamVar) alphaEquivalent(other LamTerm) bool {
+// Equals checks wether a Var and a Term are identical
+func (lv Var) alphaEquivalent(other Term) bool {
 	switch other := other.(type) {
-	case LamVar:
+	case Var:
 		return lv == other
 
 	default:
