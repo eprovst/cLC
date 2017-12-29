@@ -4,7 +4,7 @@ package LamCalc
 // use a negative value to have no limit (use with care...)
 var MaxReductions = 10000
 
-// Checks if the term can be reduced
+// Checks if the term can be reduced (only checks for beta reduction, not eta)
 func (lx Appl) canReduce() bool {
 	switch lx[0].(type) {
 	case Abst:

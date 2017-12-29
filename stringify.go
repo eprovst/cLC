@@ -1,8 +1,8 @@
 package LamCalc
 
 import (
+	"bytes"
 	"strconv"
-	"strings"
 )
 
 func intToLetter(num int) string {
@@ -25,39 +25,49 @@ func intToLetter(num int) string {
 
 // String returns the Lambda Expression as a string
 func (lx Appl) String() string {
-	return lx.deDeBruijn(new([]string), new(int))
+	buffer := bytes.NewBufferString("")
+	lx.deDeBruijn(buffer, new([]string), new(int))
+
+	return buffer.String()
 }
 
-func (lx Appl) deDeBruijn(boundLetters *[]string, nextletter *int) string {
-	result := ""
-
+func (lx Appl) deDeBruijn(buffer *bytes.Buffer, boundLetters *[]string, nextletter *int) {
 	for i, part := range lx {
 		switch part := part.(type) {
 		case Var:
-			result += part.deDeBruijn(boundLetters, nextletter) + " "
+			part.deDeBruijn(buffer, boundLetters, nextletter)
 
 		case Abst:
-			result += "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
+			buffer.WriteRune('(')
+			part.deDeBruijn(buffer, boundLetters, nextletter)
+			buffer.WriteRune(')')
 
 		case Appl:
 			if i == 0 {
-				result += part.deDeBruijn(boundLetters, nextletter) + " "
+				part.deDeBruijn(buffer, boundLetters, nextletter)
 
 			} else {
-				result += "(" + part.deDeBruijn(boundLetters, nextletter) + ") "
+				buffer.WriteRune('(')
+				part.deDeBruijn(buffer, boundLetters, nextletter)
+				buffer.WriteRune(')')
 			}
 		}
+
+		buffer.WriteRune(' ')
 	}
 
-	return strings.TrimSuffix(result, " ")
+	buffer.Truncate(buffer.Len() - 1) // Remove final space
 }
 
 // String returns the lambda abstraction as a string
 func (la Abst) String() string {
-	return la.deDeBruijn(new([]string), new(int))
+	buffer := bytes.NewBufferString("")
+	la.deDeBruijn(buffer, new([]string), new(int))
+
+	return buffer.String()
 }
 
-func (la Abst) deDeBruijn(boundLetters *[]string, nextletter *int) string {
+func (la Abst) deDeBruijn(buffer *bytes.Buffer, boundLetters *[]string, nextletter *int) {
 	// Remember at which character we were
 	oldNextLetter := *nextletter
 
@@ -66,23 +76,26 @@ func (la Abst) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 	*nextletter++
 	*boundLetters = append([]string{newLetter}, *boundLetters...)
 
-	result := "λ" + newLetter + "."
-	result += la[0].deDeBruijn(boundLetters, nextletter)
+	buffer.WriteString("λ" + newLetter + ".")
+	la[0].deDeBruijn(buffer, boundLetters, nextletter)
 
 	// Remove our local naming
 	*boundLetters = (*boundLetters)[1:]
 	*nextletter = oldNextLetter
-	return result
 }
 
 // String returns the lambda variable as a string
 func (lv Var) String() string {
-	return lv.deDeBruijn(new([]string), new(int))
+	buffer := bytes.NewBufferString("")
+	lv.deDeBruijn(buffer, new([]string), new(int))
+
+	return buffer.String()
 }
 
-func (lv Var) deDeBruijn(boundLetters *[]string, nextletter *int) string {
+func (lv Var) deDeBruijn(buffer *bytes.Buffer, boundLetters *[]string, nextletter *int) {
 	if int(lv) < len(*boundLetters) && (*boundLetters)[lv] != "" {
-		return (*boundLetters)[lv]
+		buffer.WriteString((*boundLetters)[lv])
+		return
 	}
 
 	newLetter := intToLetter(*nextletter)
@@ -93,5 +106,5 @@ func (lv Var) deDeBruijn(boundLetters *[]string, nextletter *int) string {
 	}
 
 	*boundLetters = append(*boundLetters, newLetter)
-	return newLetter
+	buffer.WriteString(newLetter)
 }

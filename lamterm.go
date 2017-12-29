@@ -1,5 +1,7 @@
 package LamCalc
 
+import "bytes"
+
 // Term is a general type to represent both Applns and Absts
 type Term interface {
 	alphaEquivalent(Term) bool
@@ -12,7 +14,7 @@ type Term interface {
 	Equivalent(Term) bool
 
 	String() string
-	deDeBruijn(boundLetters *[]string, nextletter *int) string
+	deDeBruijn(buffer *bytes.Buffer, boundLetters *[]string, nextletter *int)
 
 	canReduce() bool
 
