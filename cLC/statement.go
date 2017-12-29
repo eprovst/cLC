@@ -53,6 +53,19 @@ func executeStatement(stmnt cLCStatement) {
 
 		globals[stmnt.parameters[0].(string)] = la
 
+	case "alet":
+		lx, err := stmnt.parameters[1].(LamCalc.Term).AorReduce()
+
+		if err != nil {
+			printError(err)
+			return
+		}
+
+		// Make sure it's a function
+		la := lx.WHNF()
+
+		globals[stmnt.parameters[0].(string)] = la
+
 	case "wlet":
 		la := stmnt.parameters[1].(LamCalc.Term).WHNF()
 		globals[stmnt.parameters[0].(string)] = la
@@ -86,6 +99,17 @@ func executeStatement(stmnt cLCStatement) {
 
 	case "weak":
 		expression := stmnt.parameters[0].(LamCalc.Term).WHNF()
+
+		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n\n")
+		fmt.Print("    " + expression.String() + "\n\n")
+
+	case "apor":
+		expression, err := stmnt.parameters[0].(LamCalc.Term).AorReduce()
+
+		if err != nil {
+			printError(err)
+			return
+		}
 
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n\n")
 		fmt.Print("    " + expression.String() + "\n\n")

@@ -1,6 +1,6 @@
 -- Fixed-point combinators
 
--- The Haskell Curry's famous Y combinator
+-- Haskell Curry's famous Y combinator
 wlet Y  = λf.(λx.f (x x)) (λx.f (x x))
 -- = X  = λf.(λx.x x) (λx.f (x x))
 

@@ -14,10 +14,9 @@ type Term interface {
 	Equivalent(Term) bool
 
 	String() string
-	deDeBruijn(buffer *bytes.Buffer, boundLetters *[]string, nextletter *int)
+	deDeBruijn(*bytes.Buffer, *[]string, *int)
 
 	canReduce() bool
-
 	Reduce() (Term, error)
 
 	NorReduce() (Term, error)

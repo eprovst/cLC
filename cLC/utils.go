@@ -70,6 +70,12 @@ Availabe commands:
 let <new global> = <lambda expression>
 → If the expansion can be fully reduced sets the global equal to that reduced form.
 
+apor <lambda expression>
+→ Applicative order expansion is tried for the expression, if there's a result it will be shown.
+
+alet <new global> = <lambda expression>
+→ Equivalent to let but uses applicative order.
+
 fold <lambda expression> into <global1> <global2> <...>
 → Tries to fully expand the expression and then shows the first listed global which is equivalent to that reduction.
 
