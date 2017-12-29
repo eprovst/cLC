@@ -103,7 +103,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 		return cLCStatement{
 			command:    "fold",
-			parameters: []interface{}{expression, vars},
+			parameters: []interface{}{expression.Simplify(), vars},
 		}, nil
 
 	case "load":
@@ -128,7 +128,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 		return cLCStatement{
 			command:    "weak",
-			parameters: []interface{}{expression},
+			parameters: []interface{}{expression.Simplify()},
 		}, nil
 
 	default:
@@ -140,7 +140,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 		return cLCStatement{
 			command:    "show",
-			parameters: []interface{}{expression},
+			parameters: []interface{}{expression.Simplify()},
 		}, nil
 	}
 }
