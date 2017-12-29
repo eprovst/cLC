@@ -14,10 +14,15 @@ type Term interface {
 	String() string
 	deDeBruijn(boundLetters *[]string, nextletter *int) string
 
+	canReduce() bool
+
 	Reduce() (Term, error)
 
 	NorReduce() (Term, error)
 	norReduceOnce() Term
+
+	AorReduce() (Term, error)
+	aorReduceOnce() Term
 
 	WHNF() Abst
 }

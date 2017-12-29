@@ -6,15 +6,13 @@ import (
 
 // NorReduce reduces a lambda expression using normal order
 func (lx Appl) NorReduce() (Term, error) {
-	var ls Term = lx
-	nw := ls.norReduceOnce()
+	nw := lx.norReduceOnce()
 
-	for c := 0; !nw.alphaEquivalent(ls); c++ {
+	for c := 1; nw.canReduce(); c++ {
 		if c == MaxReductions {
 			return nil, errors.New("exeeded maximum amount of reductions")
 		}
 
-		ls = nw
 		nw = nw.norReduceOnce()
 	}
 
@@ -27,10 +25,11 @@ func (lx Appl) norReduceOnce() Term {
 	case Abst:
 		return fst.betaReduce(lx[1])
 
-	case Var:
-		return Appl{lx[0], lx[1].norReduceOnce()}
-
 	default:
+		if !lx[0].canReduce() {
+			return Appl{lx[0], lx[1].norReduceOnce()}
+		}
+
 		return Appl{lx[0].norReduceOnce(), lx[1]}
 	}
 
@@ -38,15 +37,13 @@ func (lx Appl) norReduceOnce() Term {
 
 // NorReduce reduces a lambda abstraction using normal order
 func (la Abst) NorReduce() (Term, error) {
-	var ls Term = la
-	nw := ls.norReduceOnce()
+	nw := la.norReduceOnce()
 
-	for c := 0; !nw.alphaEquivalent(ls); c++ {
+	for c := 1; nw.canReduce(); c++ {
 		if c == MaxReductions {
 			return nil, errors.New("exeeded maximum amount of reductions")
 		}
 
-		ls = nw
 		nw = nw.norReduceOnce()
 	}
 

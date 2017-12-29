@@ -41,7 +41,7 @@ func executeStatement(stmnt cLCStatement) {
 		showInfo()
 
 	case "let":
-		lx, err := stmnt.parameters[1].(LamCalc.Term).Reduce()
+		lx, err := stmnt.parameters[1].(LamCalc.Term).NorReduce()
 
 		if err != nil {
 			printError(err)
@@ -58,7 +58,7 @@ func executeStatement(stmnt cLCStatement) {
 		globals[stmnt.parameters[0].(string)] = la
 
 	case "fold":
-		expression, err := stmnt.parameters[0].(LamCalc.Term).Reduce()
+		expression, err := stmnt.parameters[0].(LamCalc.Term).NorReduce()
 
 		if err != nil {
 			printError(err)
@@ -91,7 +91,7 @@ func executeStatement(stmnt cLCStatement) {
 		fmt.Print("    " + expression.String() + "\n\n")
 
 	case "show":
-		expression, err := stmnt.parameters[0].(LamCalc.Term).Reduce()
+		expression, err := stmnt.parameters[0].(LamCalc.Term).NorReduce()
 
 		if err != nil {
 			printError(err)
