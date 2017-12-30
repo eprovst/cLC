@@ -43,24 +43,30 @@ func executeStatement(stmnt cLCStatement) {
 		showInfo()
 
 	case "let", "alet", "wlet":
-		var lx LamCalc.Term
+		var rs interface{}
 		var err error
 
 		switch cmd {
 		case "alet":
-			lx, err = stmnt.parameters[1].(LamCalc.Term).AorReduce()
+			rs, err = stoppable(func() (interface{}, error) {
+				return stmnt.parameters[1].(LamCalc.Term).AorReduce()
+			})
 
 		case "wlet":
-			lx, err = stmnt.parameters[1].(LamCalc.Term), error(nil)
+			rs, err = stmnt.parameters[1].(LamCalc.Term), error(nil)
 
 		default:
-			lx, err = stmnt.parameters[1].(LamCalc.Term).NorReduce()
+			rs, err = stoppable(func() (interface{}, error) {
+				return stmnt.parameters[1].(LamCalc.Term).NorReduce()
+			})
 		}
 
 		if err != nil {
 			printError(err)
 			return
 		}
+
+		lx := rs.(LamCalc.Term)
 
 		// Make sure it's a function
 		la := lx.WHNF()
@@ -68,12 +74,16 @@ func executeStatement(stmnt cLCStatement) {
 		globals[stmnt.parameters[0].(string)] = la
 
 	case "fold":
-		expression, err := stmnt.parameters[0].(LamCalc.Term).NorReduce()
+		rs, err := stoppable(func() (interface{}, error) {
+			return stmnt.parameters[1].(LamCalc.Term).NorReduce()
+		})
 
 		if err != nil {
 			printError(err)
 			return
 		}
+
+		expression := rs.(LamCalc.Term)
 
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n")
 
@@ -95,24 +105,30 @@ func executeStatement(stmnt cLCStatement) {
 		loadFiles(stmnt.parameters[0].([]string))
 
 	case "show", "apor", "weak":
-		var expression LamCalc.Term
+		var rs interface{}
 		var err error
 
 		switch cmd {
 		case "apor":
-			expression, err = stmnt.parameters[0].(LamCalc.Term).AorReduce()
+			rs, err = stoppable(func() (interface{}, error) {
+				return stmnt.parameters[0].(LamCalc.Term).AorReduce()
+			})
 
 		case "weak":
-			expression, err = stmnt.parameters[0].(LamCalc.Term).WHNF(), error(nil)
+			rs, err = stmnt.parameters[0].(LamCalc.Term).WHNF(), error(nil)
 
 		default:
-			expression, err = stmnt.parameters[0].(LamCalc.Term).NorReduce()
+			rs, err = stoppable(func() (interface{}, error) {
+				return stmnt.parameters[0].(LamCalc.Term).NorReduce()
+			})
 		}
 
 		if err != nil {
 			printError(err)
 			return
 		}
+
+		expression := rs.(LamCalc.Term)
 
 		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n\n")
 		fmt.Print("    " + expression.String() + "\n\n")
