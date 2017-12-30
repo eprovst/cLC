@@ -15,7 +15,9 @@ type cLCStatement struct {
 }
 
 func executeStatement(stmnt cLCStatement) {
-	switch stmnt.command {
+	cmd := stmnt.command
+
+	switch cmd {
 	case "none":
 		// Nothing to do
 
@@ -40,8 +42,20 @@ func executeStatement(stmnt cLCStatement) {
 	case "info":
 		showInfo()
 
-	case "let":
-		lx, err := stmnt.parameters[1].(LamCalc.Term).NorReduce()
+	case "let", "alet", "wlet":
+		var lx LamCalc.Term
+		var err error
+
+		switch cmd {
+		case "alet":
+			lx, err = stmnt.parameters[1].(LamCalc.Term).AorReduce()
+
+		case "wlet":
+			lx, err = stmnt.parameters[1].(LamCalc.Term), error(nil)
+
+		default:
+			lx, err = stmnt.parameters[1].(LamCalc.Term).NorReduce()
+		}
 
 		if err != nil {
 			printError(err)
@@ -51,23 +65,6 @@ func executeStatement(stmnt cLCStatement) {
 		// Make sure it's a function
 		la := lx.WHNF()
 
-		globals[stmnt.parameters[0].(string)] = la
-
-	case "alet":
-		lx, err := stmnt.parameters[1].(LamCalc.Term).AorReduce()
-
-		if err != nil {
-			printError(err)
-			return
-		}
-
-		// Make sure it's a function
-		la := lx.WHNF()
-
-		globals[stmnt.parameters[0].(string)] = la
-
-	case "wlet":
-		la := stmnt.parameters[1].(LamCalc.Term).WHNF()
 		globals[stmnt.parameters[0].(string)] = la
 
 	case "fold":
@@ -97,25 +94,20 @@ func executeStatement(stmnt cLCStatement) {
 	case "load":
 		loadFiles(stmnt.parameters[0].([]string))
 
-	case "weak":
-		expression := stmnt.parameters[0].(LamCalc.Term).WHNF()
+	case "show", "apor", "weak":
+		var expression LamCalc.Term
+		var err error
 
-		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n\n")
-		fmt.Print("    " + expression.String() + "\n\n")
+		switch cmd {
+		case "apor":
+			expression, err = stmnt.parameters[0].(LamCalc.Term).AorReduce()
 
-	case "apor":
-		expression, err := stmnt.parameters[0].(LamCalc.Term).AorReduce()
+		case "weak":
+			expression, err = stmnt.parameters[0].(LamCalc.Term).WHNF(), error(nil)
 
-		if err != nil {
-			printError(err)
-			return
+		default:
+			expression, err = stmnt.parameters[0].(LamCalc.Term).NorReduce()
 		}
-
-		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n\n")
-		fmt.Print("    " + expression.String() + "\n\n")
-
-	case "show":
-		expression, err := stmnt.parameters[0].(LamCalc.Term).NorReduce()
 
 		if err != nil {
 			printError(err)

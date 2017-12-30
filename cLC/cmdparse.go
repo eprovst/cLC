@@ -16,25 +16,18 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		return cLCStatement{command: "none"}, nil
 	}
 
-	switch strings.Fields(stmnt)[0] {
-	case "exit":
-		return cLCStatement{command: "exit"}, nil
+	cmd := strings.Fields(stmnt)[0]
 
-	case "clear":
-		return cLCStatement{command: "clear"}, nil
+	switch cmd {
+	case "exit", "clear", "info", "help":
+		return cLCStatement{command: cmd}, nil
 
-	case "info":
-		return cLCStatement{command: "info"}, nil
-
-	case "help":
-		return cLCStatement{command: "help"}, nil
-
-	case "let":
-		stmnt = strings.TrimPrefix(stmnt, "let")
+	case "let", "alet", "wlet":
+		stmnt = strings.TrimPrefix(stmnt, cmd)
 		splitStmnt := strings.SplitAfter(stmnt, "=")
 
 		if len(splitStmnt) < 2 {
-			return cLCStatement{}, errors.New("no expression in let operation")
+			return cLCStatement{}, errors.New("no expression in " + cmd + " operation")
 		}
 
 		varname := strings.TrimSpace(strings.TrimSuffix(splitStmnt[0], "="))
@@ -42,7 +35,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		varname = strings.Replace(varname, "\\", "λ", -1)
 
 		if !isValidVariableName(varname) {
-			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in let operation")
+			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in " + cmd + " operation")
 		}
 
 		expression, err := parseString(splitStmnt[1], globals)
@@ -52,61 +45,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		}
 
 		return cLCStatement{
-			command:    "let",
-			parameters: []interface{}{varname, expression},
-		}, nil
-
-	case "alet":
-		stmnt = strings.TrimPrefix(stmnt, "alet")
-		splitStmnt := strings.SplitAfter(stmnt, "=")
-
-		if len(splitStmnt) < 2 {
-			return cLCStatement{}, errors.New("no expression in alet operation")
-		}
-
-		varname := strings.TrimSpace(strings.TrimSuffix(splitStmnt[0], "="))
-		// \ should always become λ
-		varname = strings.Replace(varname, "\\", "λ", -1)
-
-		if !isValidVariableName(varname) {
-			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in alet operation")
-		}
-
-		expression, err := parseString(splitStmnt[1], globals)
-
-		if err != nil {
-			return cLCStatement{}, err
-		}
-
-		return cLCStatement{
-			command:    "alet",
-			parameters: []interface{}{varname, expression},
-		}, nil
-
-	case "wlet":
-		stmnt = strings.TrimPrefix(stmnt, "wlet")
-		splitStmnt := strings.SplitAfter(stmnt, "=")
-
-		if len(splitStmnt) < 2 {
-			return cLCStatement{}, errors.New("no expression in wlet operation")
-		}
-
-		varname := strings.TrimSpace(strings.TrimSuffix(splitStmnt[0], "="))
-		// \ should always become λ
-		varname = strings.Replace(varname, "\\", "λ", -1)
-
-		if !isValidVariableName(varname) {
-			return cLCStatement{}, errors.New("invalid variable name '" + varname + "' in wlet operation")
-		}
-
-		expression, err := parseString(splitStmnt[1], globals)
-
-		if err != nil {
-			return cLCStatement{}, err
-		}
-
-		return cLCStatement{
-			command:    "wlet",
+			command:    cmd,
 			parameters: []interface{}{varname, expression},
 		}, nil
 
@@ -145,8 +84,8 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 		return cLCStatement{}, errors.New("no files listed to load")
 
-	case "weak":
-		stmnt = strings.TrimPrefix(stmnt, "weak")
+	case "apor", "weak":
+		stmnt = strings.TrimPrefix(stmnt, cmd)
 		expression, err := parseString(stmnt, globals)
 
 		if err != nil {
@@ -154,20 +93,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 		}
 
 		return cLCStatement{
-			command:    "weak",
-			parameters: []interface{}{expression},
-		}, nil
-
-	case "apor":
-		stmnt = strings.TrimPrefix(stmnt, "apor")
-		expression, err := parseString(stmnt, globals)
-
-		if err != nil {
-			return cLCStatement{}, err
-		}
-
-		return cLCStatement{
-			command:    "apor",
+			command:    cmd,
 			parameters: []interface{}{expression},
 		}, nil
 
