@@ -4,21 +4,6 @@ import (
 	"errors"
 )
 
-// NorReduce reduces a lambda expression using normal order
-func (lx Appl) NorReduce() (Term, error) {
-	nw := lx.norReduceOnce()
-
-	for c := 1; nw.canReduce(); c++ {
-		if c == MaxReductions {
-			return nil, errors.New("exeeded maximum amount of reductions")
-		}
-
-		nw = nw.norReduceOnce()
-	}
-
-	return nw.etaReduce(), nil
-}
-
 // norReduceOnce reduces a lambda application once
 func (lx Appl) norReduceOnce() Term {
 	switch fst := lx[0].(type) {
@@ -35,9 +20,19 @@ func (lx Appl) norReduceOnce() Term {
 
 }
 
-// NorReduce reduces a lambda abstraction using normal order
-func (la Abst) NorReduce() (Term, error) {
-	nw := la.norReduceOnce()
+// norReduceOnce reduces a lambda abstraction once
+func (la Abst) norReduceOnce() Term {
+	return Abst{la[0].norReduceOnce()}
+}
+
+// norReduceOnce reduces a lambda variable once
+func (lv Var) norReduceOnce() Term {
+	return lv
+}
+
+// norReduce reduces a lambda expression using normal order
+func norReduce(term Term) (Term, error) {
+	nw := term.norReduceOnce()
 
 	for c := 1; nw.canReduce(); c++ {
 		if c == MaxReductions {
@@ -50,17 +45,17 @@ func (la Abst) NorReduce() (Term, error) {
 	return nw.etaReduce(), nil
 }
 
-// norReduceOnce reduces a lambda abstraction once
-func (la Abst) norReduceOnce() Term {
-	return Abst{la[0].norReduceOnce()}
+// NorReduce reduces an application using normal order
+func (lx Appl) NorReduce() (Term, error) {
+	return norReduce(lx)
+}
+
+// NorReduce reduces a lambda abstraction using normal order
+func (la Abst) NorReduce() (Term, error) {
+	return norReduce(la)
 }
 
 // NorReduce returns the variable itself
 func (lv Var) NorReduce() (Term, error) {
 	return lv, nil
-}
-
-// norReduceOnce reduces a lambda variable once
-func (lv Var) norReduceOnce() Term {
-	return lv
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 )
@@ -19,9 +20,6 @@ func stoppable(f func() (interface{}, error)) (interface{}, error) {
 	err := make(chan error)
 
 	go func() {
-		defer close(res)
-		defer close(err)
-
 		fres, ferr := f()
 		res <- fres
 		err <- ferr
@@ -33,6 +31,9 @@ func stoppable(f func() (interface{}, error)) (interface{}, error) {
 		return fres, ferr
 
 	case <-sig:
+		// Remove the '^C' from the terminal:
+		fmt.Print("\b\b")
+
 		return nil, errors.New("keyboard interrupt")
 	}
 }

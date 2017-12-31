@@ -1,21 +1,11 @@
 package LamCalc
 
 func (lx Appl) containsVar(idx Var) bool {
-	for i := range lx {
-		if lx[i].containsVar(idx) {
-			return true
-		}
-	}
-
-	return false
+	return lx[0].containsVar(idx) || lx[0].containsVar(idx)
 }
 
 func (la Abst) containsVar(idx Var) bool {
-	if la[0].containsVar(idx + 1) {
-		return true
-	}
-
-	return false
+	return la[0].containsVar(idx + 1)
 }
 
 func (lv Var) containsVar(idx Var) bool {
@@ -38,9 +28,8 @@ func (la Abst) etaReduce() Term {
 func (lx Appl) etaReduce() Term {
 	nw := Appl{}
 
-	for i, term := range lx {
-		nw[i] = term.etaReduce()
-	}
+	nw[0] = lx[0].etaReduce()
+	nw[1] = lx[1].etaReduce()
 
 	return nw
 }

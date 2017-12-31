@@ -4,9 +4,8 @@ package LamCalc
 func (lx Appl) substitute(index Var, sub Term) Term {
 	nw := Appl{}
 
-	for i := range lx {
-		nw[i] = lx[i].substitute(index, sub)
-	}
+	nw[0] = lx[0].substitute(index, sub)
+	nw[1] = lx[1].substitute(index, sub)
 
 	return nw
 }

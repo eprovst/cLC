@@ -30,9 +30,8 @@ func shiftIndex(correction int, cutoff int, expr Term) Term {
 	default:
 		res := Appl{}
 
-		for i, term := range expr.(Appl) {
-			res[i] = shiftIndex(correction, cutoff, term)
-		}
+		res[0] = shiftIndex(correction, cutoff, expr.(Appl)[0])
+		res[1] = shiftIndex(correction, cutoff, expr.(Appl)[1])
 
 		return res
 	}

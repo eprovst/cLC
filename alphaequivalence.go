@@ -6,13 +6,7 @@ package LamCalc
 func (lx Appl) alphaEquivalent(other Term) bool {
 	switch other := other.(type) {
 	case Appl:
-		for i := range lx {
-			if !lx[i].alphaEquivalent(other[i]) {
-				return false
-			}
-		}
-
-		return true
+		return lx[0].alphaEquivalent(other[0]) && lx[1].alphaEquivalent(other[1])
 
 	default:
 		return false
@@ -23,11 +17,7 @@ func (lx Appl) alphaEquivalent(other Term) bool {
 func (la Abst) alphaEquivalent(other Term) bool {
 	switch other := other.(type) {
 	case Abst:
-		if !la[0].alphaEquivalent(other[0]) {
-			return false
-		}
-
-		return true
+		return la[0].alphaEquivalent(other[0])
 
 	default:
 		return false

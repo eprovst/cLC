@@ -4,21 +4,6 @@ import (
 	"errors"
 )
 
-// AorReduce reduces a lambda expression using applicative order
-func (lx Appl) AorReduce() (Term, error) {
-	nw := lx.aorReduceOnce()
-
-	for c := 1; nw.canReduce(); c++ {
-		if c == MaxReductions {
-			return nil, errors.New("exeeded maximum amount of reductions")
-		}
-
-		nw = nw.aorReduceOnce()
-	}
-
-	return nw.etaReduce(), nil
-}
-
 // aorReduceOnce reduces a lambda application once
 func (lx Appl) aorReduceOnce() Term {
 	if !lx[1].canReduce() {
@@ -34,9 +19,19 @@ func (lx Appl) aorReduceOnce() Term {
 	return Appl{lx[0], lx[1].aorReduceOnce()}
 }
 
-// AorReduce reduces a lambda abstraction using applicative order
-func (la Abst) AorReduce() (Term, error) {
-	nw := la.aorReduceOnce()
+// aorReduceOnce reduces a lambda abstraction once
+func (la Abst) aorReduceOnce() Term {
+	return Abst{la[0].aorReduceOnce()}
+}
+
+// aorReduceOnce reduces a lambda variable once
+func (lv Var) aorReduceOnce() Term {
+	return lv
+}
+
+// aorReduce reduces a lambda expression using applicative order
+func aorReduce(term Term) (Term, error) {
+	nw := term.aorReduceOnce()
 
 	for c := 1; nw.canReduce(); c++ {
 		if c == MaxReductions {
@@ -49,17 +44,17 @@ func (la Abst) AorReduce() (Term, error) {
 	return nw.etaReduce(), nil
 }
 
-// aorReduceOnce reduces a lambda abstraction once
-func (la Abst) aorReduceOnce() Term {
-	return Abst{la[0].aorReduceOnce()}
+// AorReduce reduces an application using applicative order
+func (lx Appl) AorReduce() (Term, error) {
+	return aorReduce(lx)
+}
+
+// AorReduce reduces a lambda abstraction using applicative order
+func (la Abst) AorReduce() (Term, error) {
+	return aorReduce(la)
 }
 
 // AorReduce returns the variable itself
 func (lv Var) AorReduce() (Term, error) {
 	return lv, nil
-}
-
-// aorReduceOnce reduces a lambda variable once
-func (lv Var) aorReduceOnce() Term {
-	return lv
 }
