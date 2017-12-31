@@ -1,7 +1,7 @@
 package LamCalc
 
 func (lx Appl) containsVar(idx Var) bool {
-	return lx[0].containsVar(idx) || lx[0].containsVar(idx)
+	return lx[0].containsVar(idx) || lx[1].containsVar(idx)
 }
 
 func (la Abst) containsVar(idx Var) bool {

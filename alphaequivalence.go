@@ -2,7 +2,7 @@ package LamCalc
 
 // As we are using De Bruijn indexes alphaEquivalence is the same as syntactic equivalence
 
-// Equals checks wether the LamExp is identical to a Term
+// Equals checks wether the Appl is identical to a Term
 func (lx Appl) alphaEquivalent(other Term) bool {
 	switch other := other.(type) {
 	case Appl:

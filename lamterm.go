@@ -16,8 +16,8 @@ type Term interface {
 	String() string
 	deDeBruijn(*bytes.Buffer, *[]string, *int)
 
-	canReduce() bool
 	Reduce() (Term, error)
+	canReduce() bool
 
 	NorReduce() (Term, error)
 	norReduceOnce() Term
@@ -26,6 +26,9 @@ type Term interface {
 	aorReduceOnce() Term
 
 	WHNF() Abst
+
+	Serialize() string
+	serialize(*bytes.Buffer)
 }
 
 // Appl is a list of Abstns, Applns and De Bruijn indexes (all lowered by one) which isn't an abstraction itself.

@@ -38,22 +38,22 @@ func (lx Appl) deDeBruijn(buffer *bytes.Buffer, boundLetters *[]string, nextlett
 			part.deDeBruijn(buffer, boundLetters, nextletter)
 
 		case Abst:
-			buffer.WriteRune('(')
+			buffer.WriteByte('(')
 			part.deDeBruijn(buffer, boundLetters, nextletter)
-			buffer.WriteRune(')')
+			buffer.WriteByte(')')
 
 		case Appl:
 			if i == 0 {
 				part.deDeBruijn(buffer, boundLetters, nextletter)
 
 			} else {
-				buffer.WriteRune('(')
+				buffer.WriteByte('(')
 				part.deDeBruijn(buffer, boundLetters, nextletter)
-				buffer.WriteRune(')')
+				buffer.WriteByte(')')
 			}
 		}
 
-		buffer.WriteRune(' ')
+		buffer.WriteByte(' ')
 	}
 
 	buffer.Truncate(buffer.Len() - 1) // Remove final space
@@ -76,7 +76,10 @@ func (la Abst) deDeBruijn(buffer *bytes.Buffer, boundLetters *[]string, nextlett
 	*nextletter++
 	*boundLetters = append([]string{newLetter}, *boundLetters...)
 
-	buffer.WriteString("λ" + newLetter + ".")
+	buffer.WriteRune('λ')
+	buffer.WriteString(newLetter)
+	buffer.WriteByte('.')
+
 	la[0].deDeBruijn(buffer, boundLetters, nextletter)
 
 	// Remove our local naming

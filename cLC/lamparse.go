@@ -111,11 +111,8 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.Var, globals m
 
 			term[1] = cterm
 
-		case '\t':
-			// Skip tabs
-
-		case ' ':
-			// Skip spaces
+		case ' ', '\t':
+			// Skip spaces and tabs
 
 		default:
 			// A variable
