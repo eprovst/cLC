@@ -8,7 +8,7 @@ import (
 func (lx Appl) norReduceOnce() Term {
 	switch fst := lx[0].(type) {
 	case Abst:
-		return fst.betaReduce(lx[1])
+		return fst.BetaReduce(lx[1])
 
 	default:
 		if !lx[0].canReduce() {
@@ -32,17 +32,15 @@ func (lv Var) norReduceOnce() Term {
 
 // norReduce reduces a lambda expression using normal order
 func norReduce(term Term) (Term, error) {
-	nw := term.norReduceOnce()
-
-	for c := 1; nw.canReduce(); c++ {
+	for c := 0; term.canReduce(); c++ {
 		if c == MaxReductions {
 			return nil, errors.New("exeeded maximum amount of reductions")
 		}
 
-		nw = nw.norReduceOnce()
+		term = term.norReduceOnce()
 	}
 
-	return nw.etaReduce(), nil
+	return term.EtaReduce(), nil
 }
 
 // NorReduce reduces an application using normal order

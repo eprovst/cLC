@@ -2,27 +2,23 @@ package LamCalc
 
 import "bytes"
 
-// Term is a general type to represent both Applns and Absts
+// Term is a general type to represent both Applns, Absts and Vars
 type Term interface {
-	alphaEquivalent(Term) bool
+	AlphaEquivalent(Term) bool
+	EtaReduce() Term
 
-	substitute(Var, Term) Term
-
+	canReduce() bool
 	containsVar(Var) bool
-	etaReduce() Term
-
-	Equivalent(Term) bool
+	substitute(Var, Term) Term
 
 	String() string
 	deDeBruijn(*bytes.Buffer, *[]string, *int)
 
 	Reduce() (Term, error)
-	canReduce() bool
-
 	NorReduce() (Term, error)
-	norReduceOnce() Term
-
 	AorReduce() (Term, error)
+
+	norReduceOnce() Term
 	aorReduceOnce() Term
 
 	WHNF() Abst
@@ -31,11 +27,11 @@ type Term interface {
 	serialize(*bytes.Buffer)
 }
 
-// Appl is a list of Abstns, Applns and De Bruijn indexes (all lowered by one) which isn't an abstraction itself.
+// Appl represents an application
 type Appl [2]Term
 
-// Abst is a list of Abstns, Applns and De Bruijn indexes (all lowered by one)
+// Abst represents a lambda abstraction
 type Abst [1]Term
 
-// Var is a variable
+// Var is the De Bruijn index of a variable minus one
 type Var uint

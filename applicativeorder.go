@@ -9,7 +9,7 @@ func (lx Appl) aorReduceOnce() Term {
 	if !lx[1].canReduce() {
 		switch fst := lx[0].(type) {
 		case Abst:
-			return fst.betaReduce(lx[1])
+			return fst.BetaReduce(lx[1])
 
 		default:
 			return Appl{lx[0].aorReduceOnce(), lx[1]}
@@ -31,17 +31,15 @@ func (lv Var) aorReduceOnce() Term {
 
 // aorReduce reduces a lambda expression using applicative order
 func aorReduce(term Term) (Term, error) {
-	nw := term.aorReduceOnce()
-
-	for c := 1; nw.canReduce(); c++ {
+	for c := 0; term.canReduce(); c++ {
 		if c == MaxReductions {
 			return nil, errors.New("exeeded maximum amount of reductions")
 		}
 
-		nw = nw.aorReduceOnce()
+		term = term.aorReduceOnce()
 	}
 
-	return nw.etaReduce(), nil
+	return term.EtaReduce(), nil
 }
 
 // AorReduce reduces an application using applicative order
