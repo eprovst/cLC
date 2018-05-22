@@ -42,23 +42,16 @@ func executeStatement(stmnt cLCStatement) {
 	case "info":
 		showInfo()
 
-	case "let", "alet", "wlet":
+	case "let", "wlet":
 		var rs interface{}
 		var err error
 
 		switch cmd {
-		case "alet":
-			rs, err = stoppable(func() (interface{}, error) {
-				return stmnt.parameters[1].(lamcalc.Term).AorReduce()
-			})
-
 		case "wlet":
 			rs, err = stmnt.parameters[1].(lamcalc.Term), error(nil)
 
 		default:
-			rs, err = stoppable(func() (interface{}, error) {
-				return stmnt.parameters[1].(lamcalc.Term).NorReduce()
-			})
+			rs, err = concurrentReduce(stmnt.parameters[1].(lamcalc.Term))
 		}
 
 		if err != nil {
@@ -74,9 +67,7 @@ func executeStatement(stmnt cLCStatement) {
 		globals[stmnt.parameters[0].(string)] = la
 
 	case "fold":
-		rs, err := stoppable(func() (interface{}, error) {
-			return stmnt.parameters[1].(lamcalc.Term).NorReduce()
-		})
+		rs, err := concurrentReduce(stmnt.parameters[1].(lamcalc.Term))
 
 		if err != nil {
 			printError(err)
@@ -104,23 +95,16 @@ func executeStatement(stmnt cLCStatement) {
 	case "load":
 		loadFiles(stmnt.parameters[0].([]string))
 
-	case "show", "apor", "weak":
+	case "show", "weak":
 		var rs interface{}
 		var err error
 
 		switch cmd {
-		case "apor":
-			rs, err = stoppable(func() (interface{}, error) {
-				return stmnt.parameters[0].(lamcalc.Term).AorReduce()
-			})
-
 		case "weak":
 			rs, err = stmnt.parameters[0].(lamcalc.Term).WHNF(), error(nil)
 
 		default:
-			rs, err = stoppable(func() (interface{}, error) {
-				return stmnt.parameters[0].(lamcalc.Term).NorReduce()
-			})
+			rs, err = concurrentReduce(stmnt.parameters[0].(lamcalc.Term))
 		}
 
 		if err != nil {

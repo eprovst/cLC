@@ -49,7 +49,7 @@ cLamCalc v1.2.0
 
 commandline Lambda Calculator
 
-Copyright (c) 2018 Evert Provoost.
+Copyright (c) 2017-2018 Evert Provoost.
 All Rights Reserved.
 
 `)
@@ -65,16 +65,10 @@ For full details: visit the project's wiki.
 Availabe commands:
 
 <lambda expression>
-→ Normal order expansion is tried for the expression, if there's a result it will be shown.
+→ Normal order and applicative order expansion are tried for the expression, if there's a result it will be shown.
 
 let <new global> = <lambda expression>
 → If the expansion can be fully reduced sets the global equal to that reduced form.
-
-apor <lambda expression>
-→ Applicative order expansion is tried for the expression, if there's a result it will be shown.
-
-alet <new global> = <lambda expression>
-→ Equivalent to let but uses applicative order.
 
 fold <lambda expression> into <global1> <global2> <...>
 → Tries to fully expand the expression and then shows the first listed global which is equivalent to that reduction.
