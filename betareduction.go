@@ -1,4 +1,4 @@
-package LamCalc
+package lamcalc
 
 // substitute replaces index by sub
 func (lx Appl) substitute(index Var, sub Term) Term {

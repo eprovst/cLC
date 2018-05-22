@@ -4,18 +4,18 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/ElecProg/LamCalc"
+	"github.com/ElecProg/lamcalc"
 )
 
 // parseString turns the input into a Term
-func parseString(expr string, globals map[string]LamCalc.Abst) (LamCalc.Term, error) {
+func parseString(expr string, globals map[string]lamcalc.Abst) (lamcalc.Term, error) {
 	// Backslash is a notation for lambda
 	expr = strings.Replace(expr, "\\", "λ", -1)
 
-	return furtherParseString([]rune(expr), map[string]LamCalc.Var{}, globals)
+	return furtherParseString([]rune(expr), map[string]lamcalc.Var{}, globals)
 }
 
-func furtherParseString(expr []rune, boundVars map[string]LamCalc.Var, globals map[string]LamCalc.Abst) (LamCalc.Term, error) {
+func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals map[string]lamcalc.Abst) (lamcalc.Term, error) {
 	// Clean string
 	expr = []rune(strings.TrimSpace(string(expr)))
 
@@ -33,7 +33,7 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.Var, globals m
 
 		// Create copy of boundVars where every index is one higher
 		oldVars := boundVars
-		boundVars = map[string]LamCalc.Var{}
+		boundVars = map[string]lamcalc.Var{}
 
 		// First increment the index of each bound variable
 		for variable := range oldVars {
@@ -66,10 +66,10 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.Var, globals m
 			return nil, err
 		}
 
-		return LamCalc.Abst{part}, nil
+		return lamcalc.Abst{part}, nil
 	}
 
-	term := LamCalc.Appl{}
+	term := lamcalc.Appl{}
 
 	for i := 0; i < len(expr); i++ {
 		switch expr[i] {
@@ -85,7 +85,7 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.Var, globals m
 			term[1] = part
 
 		case '(':
-			var cterm LamCalc.Term
+			var cterm lamcalc.Term
 
 			i++
 			starte := i
@@ -148,10 +148,10 @@ func furtherParseString(expr []rune, boundVars map[string]LamCalc.Var, globals m
 		// If the Appl is full: encapsulate it in a new one
 		if term[1] != nil {
 			if term[0] == nil { // First term wasn't added (happens after first element)
-				term = LamCalc.Appl{term[1]}
+				term = lamcalc.Appl{term[1]}
 
 			} else {
-				term = LamCalc.Appl{term}
+				term = lamcalc.Appl{term}
 			}
 		}
 	}

@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ElecProg/LamCalc"
+	"github.com/ElecProg/lamcalc"
 	"github.com/chzyer/readline"
 )
 
-var globals = map[string]LamCalc.Abst{}
+var globals = map[string]lamcalc.Abst{}
 
 func main() {
 	// A warm welcome
 	showInfo()
 
 	// Limited the amount of time we wait for computation to finish
-	LamCalc.MaxReductions = 5000
+	lamcalc.MaxReductions = 5000
 
 	// Load files
 	if len(os.Args) > 1 {

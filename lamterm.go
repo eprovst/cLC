@@ -1,4 +1,4 @@
-package LamCalc
+package lamcalc
 
 import "bytes"
 

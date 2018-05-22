@@ -1,4 +1,4 @@
-package LamCalc
+package lamcalc
 
 // WHNF encapsulates the expression in a lambda abstraction
 func (lx Appl) WHNF() Abst {

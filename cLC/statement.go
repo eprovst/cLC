@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/ElecProg/LamCalc"
+	"github.com/ElecProg/lamcalc"
 )
 
 type cLCStatement struct {
@@ -49,15 +49,15 @@ func executeStatement(stmnt cLCStatement) {
 		switch cmd {
 		case "alet":
 			rs, err = stoppable(func() (interface{}, error) {
-				return stmnt.parameters[1].(LamCalc.Term).AorReduce()
+				return stmnt.parameters[1].(lamcalc.Term).AorReduce()
 			})
 
 		case "wlet":
-			rs, err = stmnt.parameters[1].(LamCalc.Term), error(nil)
+			rs, err = stmnt.parameters[1].(lamcalc.Term), error(nil)
 
 		default:
 			rs, err = stoppable(func() (interface{}, error) {
-				return stmnt.parameters[1].(LamCalc.Term).NorReduce()
+				return stmnt.parameters[1].(lamcalc.Term).NorReduce()
 			})
 		}
 
@@ -66,7 +66,7 @@ func executeStatement(stmnt cLCStatement) {
 			return
 		}
 
-		lx := rs.(LamCalc.Term)
+		lx := rs.(lamcalc.Term)
 
 		// Make sure it's a function
 		la := lx.WHNF()
@@ -75,7 +75,7 @@ func executeStatement(stmnt cLCStatement) {
 
 	case "fold":
 		rs, err := stoppable(func() (interface{}, error) {
-			return stmnt.parameters[1].(LamCalc.Term).NorReduce()
+			return stmnt.parameters[1].(lamcalc.Term).NorReduce()
 		})
 
 		if err != nil {
@@ -83,9 +83,9 @@ func executeStatement(stmnt cLCStatement) {
 			return
 		}
 
-		expression := rs.(LamCalc.Term)
+		expression := rs.(lamcalc.Term)
 
-		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n")
+		fmt.Print("\n" + stmnt.parameters[0].(lamcalc.Term).String() + " =\n")
 
 		couldFold := false
 		for _, gvar := range stmnt.parameters[1].([]string) {
@@ -111,15 +111,15 @@ func executeStatement(stmnt cLCStatement) {
 		switch cmd {
 		case "apor":
 			rs, err = stoppable(func() (interface{}, error) {
-				return stmnt.parameters[0].(LamCalc.Term).AorReduce()
+				return stmnt.parameters[0].(lamcalc.Term).AorReduce()
 			})
 
 		case "weak":
-			rs, err = stmnt.parameters[0].(LamCalc.Term).WHNF(), error(nil)
+			rs, err = stmnt.parameters[0].(lamcalc.Term).WHNF(), error(nil)
 
 		default:
 			rs, err = stoppable(func() (interface{}, error) {
-				return stmnt.parameters[0].(LamCalc.Term).NorReduce()
+				return stmnt.parameters[0].(lamcalc.Term).NorReduce()
 			})
 		}
 
@@ -128,9 +128,9 @@ func executeStatement(stmnt cLCStatement) {
 			return
 		}
 
-		expression := rs.(LamCalc.Term)
+		expression := rs.(lamcalc.Term)
 
-		fmt.Print("\n" + stmnt.parameters[0].(LamCalc.Term).String() + " =\n\n")
+		fmt.Print("\n" + stmnt.parameters[0].(lamcalc.Term).String() + " =\n\n")
 		fmt.Print("    " + expression.String() + "\n\n")
 	}
 }

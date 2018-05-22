@@ -44,12 +44,12 @@ func showInfo() {
   /     /\  (
   \__  /  \  \___
 
-cLamCalc v1.1.0
+cLamCalc v1.2.0
 ---------------
 
 commandline Lambda Calculator
 
-Copyright (c) 2017 Evert Provoost.
+Copyright (c) 2018 Evert Provoost.
 All Rights Reserved.
 
 `)
