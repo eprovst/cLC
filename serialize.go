@@ -1,24 +1,24 @@
 package lamcalc
 
 import (
-	"bytes"
 	"strconv"
+	"strings"
 )
 
 // Serialize returns the application as a De Bruijn index representation
 func (lx Appl) Serialize() string {
-	buffer := bytes.NewBufferString("")
+	builder := strings.Builder{}
 
-	lx.serialize(buffer)
-	return buffer.String()
+	lx.serialize(&builder)
+	return builder.String()
 }
 
 // Serialize returns the lambda abstraction as a De Bruijn index representation
 func (la Abst) Serialize() string {
-	buffer := bytes.NewBufferString("")
+	builder := strings.Builder{}
 
-	la.serialize(buffer)
-	return buffer.String()
+	la.serialize(&builder)
+	return builder.String()
 }
 
 // Serialize returns the variable as a De Bruijn index representation
@@ -27,43 +27,43 @@ func (lv Var) Serialize() string {
 	return strconv.Itoa(idx)
 }
 
-func (lx Appl) serialize(buffer *bytes.Buffer) {
+func (lx Appl) serialize(builder *strings.Builder) {
 	// This flag is ued later on to decide if a space is necessary
 	bracketInMiddle := false
 
 	switch lx[0].(type) {
 	case Abst:
-		buffer.WriteByte('(')
-		lx[0].serialize(buffer)
-		buffer.WriteByte(')')
+		builder.WriteByte('(')
+		lx[0].serialize(builder)
+		builder.WriteByte(')')
 
 		bracketInMiddle = true
 
 	default:
-		lx[0].serialize(buffer)
+		lx[0].serialize(builder)
 	}
 
 	switch lx[1].(type) {
 	case Appl:
-		buffer.WriteByte('(')
-		lx[1].serialize(buffer)
-		buffer.WriteByte(')')
+		builder.WriteByte('(')
+		lx[1].serialize(builder)
+		builder.WriteByte(')')
 
 	default:
 		if !bracketInMiddle {
-			buffer.WriteByte(' ')
+			builder.WriteByte(' ')
 		}
 
-		lx[1].serialize(buffer)
+		lx[1].serialize(builder)
 	}
 }
 
-func (la Abst) serialize(buffer *bytes.Buffer) {
-	buffer.WriteByte('l')
-	la[0].serialize(buffer)
+func (la Abst) serialize(builder *strings.Builder) {
+	builder.WriteByte('l')
+	la[0].serialize(builder)
 }
 
-func (lv Var) serialize(buffer *bytes.Buffer) {
+func (lv Var) serialize(builder *strings.Builder) {
 	idx := int(lv) + 1
-	buffer.WriteString(strconv.Itoa(idx))
+	builder.WriteString(strconv.Itoa(idx))
 }

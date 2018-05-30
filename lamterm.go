@@ -1,6 +1,8 @@
 package lamcalc
 
-import "bytes"
+import (
+	"strings"
+)
 
 // Term is a general type to represent both Applns, Absts and Vars
 type Term interface {
@@ -12,7 +14,7 @@ type Term interface {
 	substitute(Var, Term) Term
 
 	String() string
-	deDeBruijn(*bytes.Buffer, *[]string, *int)
+	deDeBruijn(*strings.Builder, *[]string, *int)
 
 	Reduce() (Term, error)
 	NorReduce() (Term, error)
@@ -24,7 +26,7 @@ type Term interface {
 	WHNF() Abst
 
 	Serialize() string
-	serialize(*bytes.Buffer)
+	serialize(*strings.Builder)
 }
 
 // Appl represents an application

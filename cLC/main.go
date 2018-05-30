@@ -14,9 +14,6 @@ func main() {
 	// A warm welcome
 	showInfo()
 
-	// Limited the amount of time we wait for computation to finish
-	lamcalc.MaxReductions = 5000
-
 	// Load files
 	if len(os.Args) > 1 {
 		loadFiles(os.Args[1:])
