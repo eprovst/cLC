@@ -18,54 +18,30 @@ func concurrentReduce(term lamcalc.Term) (lamcalc.Term, error) {
 	signal.Notify(sig, os.Interrupt)
 	defer signal.Stop(sig)
 
-	resn := make(chan lamcalc.Term)
-	errn := make(chan error)
+	res := make(chan lamcalc.Term, 2)
 
-	go func() {
-		fres, ferr := term.NorReduce()
-		resn <- fres
-		errn <- ferr
-	}()
+	donen := make(chan bool, 1)
+	go lamcalc.ConcNorReduce(term, res, donen)
 
-	resa := make(chan lamcalc.Term)
-	erra := make(chan error)
+	donea := make(chan bool, 1)
+	go lamcalc.ConcAorReduce(term, res, donea)
 
-	go func() {
-		fres, ferr := term.AorReduce()
-		resa <- fres
-		erra <- ferr
-	}()
+	select {
+	case res := <-res:
+		// Send stop signals
+		donen <- true
+		donea <- true
 
-	var err error
+		return res, nil
 
-	for errs := 0; errs < 2; errs++ {
-		select {
-		case fres := <-resn:
-			ferr := <-errn
+	case <-sig:
+		// Remove the '^C' from the terminal:
+		fmt.Print("\b\b")
 
-			if ferr == nil {
-				return fres, nil
-			}
+		// Stop computations
+		donen <- true
+		donea <- true
 
-			err = ferr
-
-		case fres := <-resa:
-			ferr := <-erra
-
-			if ferr == nil {
-				return fres, nil
-			}
-
-			err = ferr
-
-		case <-sig:
-			// Remove the '^C' from the terminal:
-			fmt.Print("\b\b")
-
-			return nil, errors.New("keyboard interrupt")
-		}
+		return nil, errors.New("keyboard interrupt")
 	}
-
-	// Both returned errors:
-	return nil, err
 }

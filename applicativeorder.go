@@ -42,6 +42,23 @@ func aorReduce(term Term) (Term, error) {
 	return term.EtaReduce(), nil
 }
 
+// ConcAorReduce reduces a lambda expression using applicative order,
+// ignores MaxReductions, instead stops calculations once a signal is sent to done.
+func ConcAorReduce(term Term, out chan Term, done chan bool) {
+	for c := 0; term.canReduce(); c++ {
+		term = term.aorReduceOnce()
+
+		// Stop if a signal is sent to done
+		select {
+		case <-done:
+			return
+		default:
+		}
+	}
+
+	out <- term.EtaReduce()
+}
+
 // AorReduce reduces an application using applicative order
 func (lx Appl) AorReduce() (Term, error) {
 	return aorReduce(lx)

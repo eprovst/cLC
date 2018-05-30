@@ -43,6 +43,23 @@ func norReduce(term Term) (Term, error) {
 	return term.EtaReduce(), nil
 }
 
+// ConcNorReduce reduces a lambda expression using normal order,
+// ignores MaxReductions, instead stops calculations once a signal is sent to done.
+func ConcNorReduce(term Term, out chan Term, done chan bool) {
+	for c := 0; term.canReduce(); c++ {
+		term = term.norReduceOnce()
+
+		// Stop if a signal is sent to done
+		select {
+		case <-done:
+			return
+		default:
+		}
+	}
+
+	out <- term.EtaReduce()
+}
+
 // NorReduce reduces an application using normal order
 func (lx Appl) NorReduce() (Term, error) {
 	return norReduce(lx)
