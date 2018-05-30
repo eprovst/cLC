@@ -9,10 +9,6 @@ import (
 	"github.com/ElecProg/lamcalc"
 )
 
-// Here we implement a system to call a function and make it stoppable on ^+C
-// The function isn't really stopped, rather it's result is discarded, and we
-// don't wait for it anymore either.
-
 func concurrentReduce(term lamcalc.Term) (lamcalc.Term, error) {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
