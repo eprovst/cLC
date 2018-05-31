@@ -70,7 +70,7 @@ Availabe commands:
 let <new global> = <lambda expression>
 → If the expansion can be fully reduced sets the global equal to that reduced form.
 
-fold <lambda expression> into <global1> <global2> <...>
+match <lambda expression> with <global1> <global2> <...>
 → Tries to fully expand the expression and then shows the first listed global which is equivalent to that reduction.
 
 weak <lambda expression>

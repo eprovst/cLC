@@ -43,45 +43,39 @@ func executeStatement(stmnt cLCStatement) {
 		showInfo()
 
 	case "let", "wlet":
-		var rs interface{}
-		var err error
-
+		var rs lamcalc.Term
 		switch cmd {
 		case "wlet":
-			rs, err = stmnt.parameters[1].(lamcalc.Term), error(nil)
+			rs = stmnt.parameters[1].(lamcalc.Term)
 
 		default:
-			rs, err = concurrentReduce(stmnt.parameters[1].(lamcalc.Term))
+			rs = concurrentReduce(stmnt.parameters[1].(lamcalc.Term))
 		}
 
-		if err != nil {
-			printError(err)
+		if rs == nil {
+			// Something went wrong
 			return
 		}
 
-		lx := rs.(lamcalc.Term)
-
 		// Make sure it's a function
-		la := lx.WHNF()
+		la := rs.WHNF()
 
 		globals[stmnt.parameters[0].(string)] = la
 
-	case "fold":
-		rs, err := concurrentReduce(stmnt.parameters[1].(lamcalc.Term))
+	case "match":
+		rs := concurrentReduce(stmnt.parameters[0].(lamcalc.Term))
 
-		if err != nil {
-			printError(err)
+		if rs == nil {
+			// Something went wrong
 			return
 		}
-
-		expression := rs.(lamcalc.Term)
 
 		fmt.Print("\n" + stmnt.parameters[0].(lamcalc.Term).String() + " =\n")
 
 		couldFold := false
 		for _, gvar := range stmnt.parameters[1].([]string) {
-			if globals[gvar].AlphaEquivalent(expression) {
-				fmt.Print(expression.String() + " =\n\n")
+			if globals[gvar].AlphaEquivalent(rs) {
+				fmt.Print(rs.String() + " =\n\n")
 				fmt.Print("    " + gvar + "\n\n")
 				couldFold = true
 				break
@@ -89,32 +83,29 @@ func executeStatement(stmnt cLCStatement) {
 		}
 
 		if !couldFold {
-			fmt.Print("\n    " + expression.String() + "\n\n")
+			fmt.Print("\n    " + rs.String() + "\n\n")
 		}
 
 	case "load":
 		loadFiles(stmnt.parameters[0].([]string))
 
 	case "show", "weak":
-		var rs interface{}
-		var err error
+		var rs lamcalc.Term
 
 		switch cmd {
 		case "weak":
-			rs, err = stmnt.parameters[0].(lamcalc.Term).WHNF(), error(nil)
+			rs = stmnt.parameters[0].(lamcalc.Term).WHNF()
 
 		default:
-			rs, err = concurrentReduce(stmnt.parameters[0].(lamcalc.Term))
+			rs = concurrentReduce(stmnt.parameters[0].(lamcalc.Term))
 		}
 
-		if err != nil {
-			printError(err)
+		if rs == nil {
+			// Something went wrong
 			return
 		}
 
-		expression := rs.(lamcalc.Term)
-
 		fmt.Print("\n" + stmnt.parameters[0].(lamcalc.Term).String() + " =\n\n")
-		fmt.Print("    " + expression.String() + "\n\n")
+		fmt.Print("    " + rs.String() + "\n\n")
 	}
 }

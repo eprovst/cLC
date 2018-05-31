@@ -22,7 +22,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 	case "exit", "clear", "info", "help":
 		return cLCStatement{command: cmd}, nil
 
-	case "let", "alet", "wlet":
+	case "let", "wlet":
 		stmnt = strings.TrimPrefix(stmnt, cmd)
 		splitStmnt := strings.SplitAfter(stmnt, "=")
 
@@ -49,26 +49,26 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 			parameters: []interface{}{varname, expression},
 		}, nil
 
-	case "fold":
-		stmnt = strings.TrimPrefix(stmnt, "fold")
-		splitStmnt := strings.SplitAfter(stmnt, "into")
+	case "match":
+		stmnt = strings.TrimPrefix(stmnt, "match")
+		splitStmnt := strings.SplitAfter(stmnt, "with")
 
 		if len(splitStmnt) < 2 {
-			return cLCStatement{}, errors.New("no targets in fold operation")
+			return cLCStatement{}, errors.New("no targets in match operation")
 		}
 
-		expression, err := parseString(strings.TrimSuffix(splitStmnt[0], "into"), globals)
+		expression, err := parseString(strings.TrimSuffix(splitStmnt[0], "with"), globals)
 		vars := strings.Fields(splitStmnt[1])
 
 		if len(vars) == 0 {
-			return cLCStatement{}, errors.New("no targets in fold operation")
+			return cLCStatement{}, errors.New("no targets in match operation")
 
 		} else if err != nil {
 			return cLCStatement{}, err
 		}
 
 		return cLCStatement{
-			command:    "fold",
+			command:    "match",
 			parameters: []interface{}{expression, vars},
 		}, nil
 
@@ -84,7 +84,7 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 		return cLCStatement{}, errors.New("no files listed to load")
 
-	case "apor", "weak":
+	case "weak":
 		stmnt = strings.TrimPrefix(stmnt, cmd)
 		expression, err := parseString(stmnt, globals)
 
