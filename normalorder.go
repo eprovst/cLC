@@ -12,17 +12,19 @@ func (lx Appl) norReduceOnce() Term {
 
 	default:
 		if !lx[0].canReduce() {
-			return Appl{lx[0], lx[1].norReduceOnce()}
+			lx[1] = lx[1].norReduceOnce()
+			return lx
 		}
 
-		return Appl{lx[0].norReduceOnce(), lx[1]}
+		lx[0] = lx[0].norReduceOnce()
+		return lx
 	}
-
 }
 
 // norReduceOnce reduces a lambda abstraction once
 func (la Abst) norReduceOnce() Term {
-	return Abst{la[0].norReduceOnce()}
+	la[0] = la[0].norReduceOnce()
+	return la
 }
 
 // norReduceOnce reduces a lambda variable once
@@ -32,6 +34,8 @@ func (lv Var) norReduceOnce() Term {
 
 // norReduce reduces a lambda expression using normal order
 func norReduce(term Term) (Term, error) {
+	term = term.Copy()
+
 	for c := 0; term.canReduce(); c++ {
 		if c == MaxReductions {
 			return nil, errors.New("exeeded maximum amount of reductions")
@@ -45,13 +49,17 @@ func norReduce(term Term) (Term, error) {
 
 // ConcNorReduce reduces a lambda expression using normal order,
 // ignores MaxReductions, instead stops calculations once a signal is sent to done.
+// If stopped mids computation puts nil on out channel.
 func ConcNorReduce(term Term, out chan Term, done chan bool) {
+	term = term.Copy()
+
 	for c := 0; term.canReduce(); c++ {
 		term = term.norReduceOnce()
 
 		// Stop if a signal is sent to done
 		select {
 		case <-done:
+			out <- nil
 			return
 		default:
 		}

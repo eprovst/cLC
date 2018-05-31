@@ -13,26 +13,23 @@ func lowerIndex(expr Term) Term {
 // shiftIndex is used to correct the De Bruijn indexes
 func shiftIndex(correction int, cutoff int, expr Term) Term {
 	switch expr := expr.(type) {
-	case Var:
-		if int(expr) >= cutoff {
-			return expr + Var(correction)
-		}
+
+	case Abst:
+		expr[0] = shiftIndex(correction, cutoff+1, expr[0])
 
 		return expr
 
-	case Abst:
-		res := Abst{}
+	case Appl:
+		expr[0] = shiftIndex(correction, cutoff, expr[0])
+		expr[1] = shiftIndex(correction, cutoff, expr[1])
 
-		res[0] = shiftIndex(correction, cutoff+1, expr[0])
-
-		return res
+		return expr
 
 	default:
-		res := Appl{}
+		if int(expr.(Var)) >= cutoff {
+			return expr.(Var) + Var(correction)
+		}
 
-		res[0] = shiftIndex(correction, cutoff, expr.(Appl)[0])
-		res[1] = shiftIndex(correction, cutoff, expr.(Appl)[1])
-
-		return res
+		return expr
 	}
 }

@@ -12,16 +12,19 @@ func (lx Appl) aorReduceOnce() Term {
 			return fst.BetaReduce(lx[1])
 
 		default:
-			return Appl{lx[0].aorReduceOnce(), lx[1]}
+			lx[0] = lx[0].aorReduceOnce()
+			return lx
 		}
 	}
 
-	return Appl{lx[0], lx[1].aorReduceOnce()}
+	lx[1] = lx[1].aorReduceOnce()
+	return lx
 }
 
 // aorReduceOnce reduces a lambda abstraction once
 func (la Abst) aorReduceOnce() Term {
-	return Abst{la[0].aorReduceOnce()}
+	la[0] = la[0].aorReduceOnce()
+	return la
 }
 
 // aorReduceOnce reduces a lambda variable once
@@ -31,6 +34,8 @@ func (lv Var) aorReduceOnce() Term {
 
 // aorReduce reduces a lambda expression using applicative order
 func aorReduce(term Term) (Term, error) {
+	term = term.Copy()
+
 	for c := 0; term.canReduce(); c++ {
 		if c == MaxReductions {
 			return nil, errors.New("exeeded maximum amount of reductions")
@@ -44,13 +49,17 @@ func aorReduce(term Term) (Term, error) {
 
 // ConcAorReduce reduces a lambda expression using applicative order,
 // ignores MaxReductions, instead stops calculations once a signal is sent to done.
+// If stopped mids computation puts nil on out channel.
 func ConcAorReduce(term Term, out chan Term, done chan bool) {
+	term = term.Copy()
+
 	for c := 0; term.canReduce(); c++ {
 		term = term.aorReduceOnce()
 
 		// Stop if a signal is sent to done
 		select {
 		case <-done:
+			out <- nil
 			return
 		default:
 		}

@@ -2,23 +2,22 @@ package lamcalc
 
 // substitute replaces index by sub
 func (lx Appl) substitute(index Var, sub Term) Term {
-	nw := Appl{}
+	lx[0] = lx[0].substitute(index, sub)
+	lx[1] = lx[1].substitute(index, sub)
 
-	nw[0] = lx[0].substitute(index, sub)
-	nw[1] = lx[1].substitute(index, sub)
-
-	return nw
+	return lx
 }
 
 // substitute replaces index by sub
 func (la Abst) substitute(index Var, sub Term) Term {
-	return Abst{la[0].substitute(index+1, heightenIndex(sub))}
+	la[0] = la[0].substitute(index+1, heightenIndex(sub))
+	return la
 }
 
 // substitute replaces index by sub
 func (lv Var) substitute(index Var, sub Term) Term {
 	if lv == index {
-		return sub
+		return sub.Copy()
 	}
 
 	return lv

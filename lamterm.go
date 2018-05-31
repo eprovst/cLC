@@ -25,6 +25,8 @@ type Term interface {
 
 	WHNF() Abst
 
+	Copy() Term
+
 	Serialize() string
 	serialize(*strings.Builder)
 }

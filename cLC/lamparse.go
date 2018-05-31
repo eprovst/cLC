@@ -137,8 +137,10 @@ func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals m
 				term[1] = cindex
 			} else {
 				cfnc, ok := globals[cvar]
+
 				if ok {
-					term[1] = cfnc
+					term[1] = cfnc.Copy()
+
 				} else {
 					return nil, errors.New("'" + cvar + "' not yet defined")
 				}

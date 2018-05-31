@@ -23,17 +23,16 @@ func (la Abst) EtaReduce() Term {
 	}
 
 	// Else we can't do etareduction
-	return Abst{la[0].EtaReduce()}
+	la[0] = la[0].EtaReduce()
+	return la
 }
 
 // EtaReduce applies eta-reduction to the Appl when possible
 func (lx Appl) EtaReduce() Term {
-	nw := Appl{}
+	lx[0] = lx[0].EtaReduce()
+	lx[1] = lx[1].EtaReduce()
 
-	nw[0] = lx[0].EtaReduce()
-	nw[1] = lx[1].EtaReduce()
-
-	return nw
+	return lx
 }
 
 // EtaReduce returns the variable
