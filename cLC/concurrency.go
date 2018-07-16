@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime/debug"
 
 	"github.com/ElecProg/lamcalc"
 )
@@ -53,6 +54,16 @@ func concurrentReduce(term lamcalc.Term) lamcalc.Term {
 		// Print error message
 		printError(errors.New("keyboard interrupt"))
 	}
+
+	/*
+	 * Okay, the following is a bit dodgy so let me explain:
+	 * This program needs rediculous amounts of memory to do its calculations
+	 * however once these are done the Golang runtime keeps this memory allocated
+	 * in case it would need it again, immediately after the calculations. Which
+	 * is here not what we want. So we force the runtime to give some memory back to
+	 * the OS.
+	 */
+	debug.FreeOSMemory()
 
 	return result
 }
