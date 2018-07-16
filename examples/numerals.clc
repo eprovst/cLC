@@ -6,7 +6,7 @@ let exp   = λm.λn.n m
 let pred  = λn.λf.λx.n (λg.λh.h (g f)) (λu.x) (λu.u)
 let minus = λm.λn.(n pred) m
 
--- Now we define all numbers from 0 to 16...
+-- Now we define all numbers from 0 to 25...
 let 0  = λf.λx.x
 let 1  = succ 0
 let 2  = succ 1
