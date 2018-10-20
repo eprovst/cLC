@@ -34,9 +34,6 @@ func (lx Appl) String() string {
 func (lx Appl) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int) {
 	for i, part := range lx {
 		switch part := part.(type) {
-		case Var:
-			part.deDeBruijn(builder, boundLetters, nextletter)
-
 		case Abst:
 			builder.WriteByte('(')
 			part.deDeBruijn(builder, boundLetters, nextletter)
@@ -51,6 +48,9 @@ func (lx Appl) deDeBruijn(builder *strings.Builder, boundLetters *[]string, next
 				part.deDeBruijn(builder, boundLetters, nextletter)
 				builder.WriteByte(')')
 			}
+
+		default:
+			part.deDeBruijn(builder, boundLetters, nextletter)
 		}
 
 		// Put space between first and second part

@@ -25,11 +25,14 @@ func shiftIndex(correction int, cutoff int, expr Term) Term {
 
 		return expr
 
-	default:
-		if int(expr.(Var)) >= cutoff {
-			return expr.(Var) + Var(correction)
+	case Var:
+		if int(expr) >= cutoff {
+			return expr + Var(correction)
 		}
 
+		return expr
+
+	default:
 		return expr
 	}
 }
