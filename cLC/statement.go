@@ -74,7 +74,9 @@ func executeStatement(stmnt cLCStatement) {
 
 		couldFold := false
 		for _, gvar := range stmnt.parameters[1].([]string) {
-			if globals[gvar].AlphaEquivalent(rs) {
+			global, exists := globals[gvar]
+
+			if exists && global.AlphaEquivalent(rs) {
 				fmt.Print(rs.String() + " =\n\n")
 				fmt.Print("    " + gvar + "\n\n")
 				couldFold = true
