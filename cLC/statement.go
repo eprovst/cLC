@@ -74,9 +74,13 @@ func executeStatement(stmnt cLCStatement) {
 
 		couldFold := false
 		for _, gvar := range stmnt.parameters[1].([]string) {
-			global, exists := globals[gvar]
+			global, ok := globals[gvar]
 
-			if exists && global.AlphaEquivalent(rs) {
+			if !ok {
+				global = lamcalc.Free(gvar)
+			}
+
+			if global.AlphaEquivalent(rs) {
 				fmt.Print(rs.String() + " =\n\n")
 				fmt.Print("    " + gvar + "\n\n")
 				couldFold = true

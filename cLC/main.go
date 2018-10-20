@@ -8,7 +8,7 @@ import (
 	"github.com/chzyer/readline"
 )
 
-var globals = map[string]lamcalc.Abst{}
+var globals = map[string]lamcalc.Term{}
 
 func main() {
 	// A warm welcome

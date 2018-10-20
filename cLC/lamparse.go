@@ -8,14 +8,14 @@ import (
 )
 
 // parseString turns the input into a Term
-func parseString(expr string, globals map[string]lamcalc.Abst) (lamcalc.Term, error) {
+func parseString(expr string, globals map[string]lamcalc.Term) (lamcalc.Term, error) {
 	// Backslash is a notation for lambda
 	expr = strings.Replace(expr, "\\", "λ", -1)
 
 	return furtherParseString([]rune(expr), map[string]lamcalc.Var{}, globals)
 }
 
-func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals map[string]lamcalc.Abst) (lamcalc.Term, error) {
+func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals map[string]lamcalc.Term) (lamcalc.Term, error) {
 	// Clean string
 	expr = []rune(strings.TrimSpace(string(expr)))
 
@@ -142,7 +142,7 @@ func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals m
 					term[1] = cfnc.Copy()
 
 				} else {
-					return nil, errors.New("'" + cvar + "' not yet defined")
+					term[1] = lamcalc.Free(cvar)
 				}
 			}
 		}
