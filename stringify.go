@@ -90,10 +90,8 @@ func (la Abst) deDeBruijn(builder *strings.Builder, boundLetters *[]string, next
 
 // String returns the lambda variable as a string
 func (lv Var) String() string {
-	builder := strings.Builder{}
-	lv.deDeBruijn(&builder, new([]string), new(int))
-
-	return builder.String()
+	// It is the first and only variable:
+	return intToLetter(0)
 }
 
 func (lv Var) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int) {
@@ -111,4 +109,14 @@ func (lv Var) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextl
 
 	*boundLetters = append(*boundLetters, newLetter)
 	builder.WriteString(newLetter)
+}
+
+// String returns the lambda variable as a string
+func (lf Free) String() string {
+	// It is the first and only variable:
+	return string(lf)
+}
+
+func (lf Free) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int) {
+	builder.WriteString(string(lf))
 }

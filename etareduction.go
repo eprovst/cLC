@@ -12,6 +12,10 @@ func (lv Var) containsVar(idx Var) bool {
 	return lv == idx
 }
 
+func (lf Free) containsVar(idx Var) bool {
+	return false
+}
+
 // EtaReduce applies eta-reduction to the Abst when possible
 func (la Abst) EtaReduce() Term {
 	switch body := la[0].(type) {
@@ -38,4 +42,9 @@ func (lx Appl) EtaReduce() Term {
 // EtaReduce returns the variable
 func (lv Var) EtaReduce() Term {
 	return lv
+}
+
+// EtaReduce returns the variable
+func (lf Free) EtaReduce() Term {
+	return lf
 }

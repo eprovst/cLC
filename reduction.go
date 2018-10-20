@@ -23,17 +23,26 @@ func (lv Var) canReduce() bool {
 	return false
 }
 
-// Reduce reduces an application
+func (lf Free) canReduce() bool {
+	return false
+}
+
+// Reduce reduces an application using applicative order
 func (lx Appl) Reduce() (Term, error) {
 	return aorReduce(lx)
 }
 
-// Reduce reduces a lambda abstraction
+// Reduce reduces a lambda abstraction using applicative order
 func (la Abst) Reduce() (Term, error) {
 	return aorReduce(la)
 }
 
 // Reduce returns the variable itself
 func (lv Var) Reduce() (Term, error) {
-	return aorReduce(lv)
+	return lv, nil
+}
+
+// Reduce returns the variable itself
+func (lf Free) Reduce() (Term, error) {
+	return lf, nil
 }

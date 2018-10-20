@@ -15,3 +15,8 @@ func (la Abst) WHNF() Abst {
 func (lv Var) WHNF() Abst {
 	return Abst{Appl{heightenIndex(lv), Var(0)}}
 }
+
+// WHNF encapsulates the free variable inside of a lambda abstraction
+func (lf Free) WHNF() Abst {
+	return Abst{Appl{lf, Var(0)}}
+}

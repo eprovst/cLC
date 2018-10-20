@@ -44,7 +44,7 @@ func showInfo() {
   /     /\  (
   \__  /  \  \___
 
-cLamCalc v1.2.0
+cLamCalc v1.3.0
 ---------------
 
 commandline Lambda Calculator

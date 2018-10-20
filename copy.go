@@ -12,5 +12,10 @@ func (la Abst) Copy() Term {
 
 // Copy returns the value of the variable
 func (lv Var) Copy() Term {
-	return lv
+	return Var(lv)
+}
+
+// Copy returns the value of the free variable
+func (lf Free) Copy() Term {
+	return Free(lf)
 }

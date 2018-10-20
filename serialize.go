@@ -27,6 +27,11 @@ func (lv Var) Serialize() string {
 	return strconv.Itoa(idx)
 }
 
+// Serialize is not yet supported for free variables
+func (lf Free) Serialize() string {
+	panic("Serialization of free variables is not yet supported")
+}
+
 func (lx Appl) serialize(builder *strings.Builder) {
 	// This flag is ued later on to decide if a space is necessary
 	bracketInMiddle := false
@@ -66,4 +71,9 @@ func (la Abst) serialize(builder *strings.Builder) {
 func (lv Var) serialize(builder *strings.Builder) {
 	idx := int(lv) + 1
 	builder.WriteString(strconv.Itoa(idx))
+}
+
+// serialize is not yet supported for free variables
+func (lf Free) serialize(builder *strings.Builder) {
+	panic("Serialization of free variables is not yet supported")
 }

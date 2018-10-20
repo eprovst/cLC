@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// Term is a general type to represent both Applns, Absts and Vars
+// Term is a general type to represent both Applns, Absts, Vars and Frees
 type Term interface {
 	AlphaEquivalent(Term) bool
 	EtaReduce() Term
@@ -37,5 +37,8 @@ type Appl [2]Term
 // Abst represents a lambda abstraction
 type Abst [1]Term
 
-// Var is the De Bruijn index of a variable minus one
+// Var is the De Bruijn index of a bound variable minus one
 type Var uint
+
+// Free is a free variable
+type Free string

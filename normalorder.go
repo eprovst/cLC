@@ -32,6 +32,11 @@ func (lv Var) norReduceOnce() Term {
 	return lv
 }
 
+// norReduceOnce reduces a free variable once
+func (lf Free) norReduceOnce() Term {
+	return lf
+}
+
 // norReduce reduces a lambda expression using normal order
 func norReduce(term Term) (Term, error) {
 	term = term.Copy()
@@ -81,4 +86,9 @@ func (la Abst) NorReduce() (Term, error) {
 // NorReduce returns the variable itself
 func (lv Var) NorReduce() (Term, error) {
 	return lv, nil
+}
+
+// NorReduce returns the variable itself
+func (lf Free) NorReduce() (Term, error) {
+	return lf, nil
 }

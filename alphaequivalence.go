@@ -34,3 +34,14 @@ func (lv Var) AlphaEquivalent(other Term) bool {
 		return false
 	}
 }
+
+// AlphaEquivalent checks whether a Free and a Term are identical
+func (lf Free) AlphaEquivalent(other Term) bool {
+	switch other := other.(type) {
+	case Free:
+		return lf == other
+
+	default:
+		return false
+	}
+}

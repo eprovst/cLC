@@ -32,6 +32,11 @@ func (lv Var) aorReduceOnce() Term {
 	return lv
 }
 
+// aorReduceOnce reduces a free variable once
+func (lf Free) aorReduceOnce() Term {
+	return lf
+}
+
 // aorReduce reduces a lambda expression using applicative order
 func aorReduce(term Term) (Term, error) {
 	term = term.Copy()
@@ -81,4 +86,9 @@ func (la Abst) AorReduce() (Term, error) {
 // AorReduce returns the variable itself
 func (lv Var) AorReduce() (Term, error) {
 	return lv, nil
+}
+
+// AorReduce returns the variable itself
+func (lf Free) AorReduce() (Term, error) {
+	return lf, nil
 }

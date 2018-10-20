@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+// TODO: Add support for free variables to the serialization format
+
 // Deserialize turns a De Bruijn index representation
 // into the internal representation
 func Deserialize(inpt string) (Term, error) {

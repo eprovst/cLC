@@ -23,7 +23,12 @@ func (lv Var) substitute(index Var, sub Term) Term {
 	return lv
 }
 
-// BetaReduce substitutes the locally bound variable of the Abst by sub
+// substitute replaces index by sub
+func (lf Free) substitute(index Var, sub Term) Term {
+	return lf
+}
+
+// BetaReduce substitutes the localy bound variable of the Abst by sub
 func (la Abst) BetaReduce(sub Term) Term {
 	return lowerIndex(
 		la[0].substitute(0, heightenIndex(sub)),
