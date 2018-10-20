@@ -48,6 +48,30 @@ func deserialize(inpt []byte) (Term, error) {
 				result = Abst{body}
 			}
 
+		case '\'':
+			// Skip ' (prime)
+			i++
+
+			begin := i
+
+			for i < len(inpt) && !strings.ContainsRune(" ()", rune(inpt[i])) {
+				// Aggregate the free variable
+				i++
+			}
+
+			if begin >= len(inpt) || begin == i {
+				return nil, errors.New("nameless free variable")
+			}
+
+			fv := Free(inpt[begin:i])
+
+			if result != nil {
+				result = Appl{result, fv}
+
+			} else {
+				result = fv
+			}
+
 		case '(': // Sub expression
 			nbrackets := 1
 			begin := i + 1
@@ -85,7 +109,7 @@ func deserialize(inpt []byte) (Term, error) {
 
 		default:
 			begin := i
-			for i+1 < len(inpt) && !strings.ContainsRune(" ()l", rune(inpt[i+1])) {
+			for i+1 < len(inpt) && !strings.ContainsRune(" ()l'", rune(inpt[i+1])) {
 				// Aggregate a number
 				i++
 			}

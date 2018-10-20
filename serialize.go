@@ -27,9 +27,9 @@ func (lv Var) Serialize() string {
 	return strconv.Itoa(idx)
 }
 
-// Serialize is not yet supported for free variables
+// Serialize the free varaible as ' (prime) followed by the variable name
 func (lf Free) Serialize() string {
-	panic("Serialization of free variables is not yet supported")
+	return "'" + string(lf)
 }
 
 func (lx Appl) serialize(builder *strings.Builder) {
@@ -73,7 +73,8 @@ func (lv Var) serialize(builder *strings.Builder) {
 	builder.WriteString(strconv.Itoa(idx))
 }
 
-// serialize is not yet supported for free variables
+// serialize the free varaible as ' (prime) followed by the variable name
 func (lf Free) serialize(builder *strings.Builder) {
-	panic("Serialization of free variables is not yet supported")
+	builder.WriteByte('\'')
+	builder.WriteString(string(lf))
 }
