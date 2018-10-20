@@ -46,7 +46,7 @@ func executeStatement(stmnt cLCStatement) {
 		var rs lamcalc.Term
 		switch cmd {
 		case "wlet":
-			rs = stmnt.parameters[1].(lamcalc.Term)
+			rs = stmnt.parameters[1].(lamcalc.Term).WHNF()
 
 		default:
 			rs = concurrentReduce(stmnt.parameters[1].(lamcalc.Term))
@@ -57,10 +57,7 @@ func executeStatement(stmnt cLCStatement) {
 			return
 		}
 
-		// Make sure it's a function
-		la := rs.WHNF()
-
-		globals[stmnt.parameters[0].(string)] = la
+		globals[stmnt.parameters[0].(string)] = rs
 
 	case "match":
 		rs := concurrentReduce(stmnt.parameters[0].(lamcalc.Term))

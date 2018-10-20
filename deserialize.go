@@ -72,6 +72,9 @@ func deserialize(inpt []byte) (Term, error) {
 				result = fv
 			}
 
+			// We overshot the position of i
+			i--
+
 		case '(': // Sub expression
 			nbrackets := 1
 			begin := i + 1
