@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/ElecProg/lamcalc"
+	"github.com/elecprog/lamcalc"
 )
 
 type cLCStatement struct {
