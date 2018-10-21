@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/chzyer/readline"
-	"github.com/elecprog/lamcalc"
+	"github.com/elecprog/cLC/lambda"
 )
 
-var globals = map[string]lamcalc.Term{}
+var globals = map[string]lambda.Term{}
 
 func main() {
 	// A warm welcome

@@ -1,4 +1,4 @@
-package lamcalc
+package lambda
 
 // As we are using De Bruijn indexes alphaEquivalence is the same as syntactic equivalence
 

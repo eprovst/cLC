@@ -1,4 +1,4 @@
-package lamcalc
+package lambda
 
 // Copy creates a copy of the application
 func (lx Appl) Copy() Term {

@@ -39,18 +39,16 @@ func loadFiles(paths []string) {
 }
 
 func showInfo() {
-	fmt.Print(`       _      ___
-   __   \    /
-  /     /\  (
-  \__  /  \  \___
+	fmt.Print(`               _      ___
+           __   \    /
+          /     /\  (
+          \__  /  \  \___
 
-cLamCalc v1.3.0
----------------
-
-commandline Lambda Calculator
+commandline Lambda Calculator v1.3.0
+------------------------------------
 
 Copyright (c) 2017-2018 Evert Provoost.
-All Rights Reserved.
+Some rights reserved.
 
 `)
 }
@@ -71,7 +69,7 @@ let <new global> = <lambda expression>
 → If the expansion can be fully reduced sets the global equal to that reduced form.
 
 match <lambda expression> with <global1> <global2> <...>
-→ Tries to fully expand the expression and then shows the first listed global which is equivalent to that reduction.
+→ Tries to fully expand the expression and then shows the first listed global/free variable which is equivalent to that reduction.
 
 weak <lambda expression>
 → Transforms the expression to a weak head normal form, then shows the result. Useful for expressions which wouldn't terminate reducing otherwise.

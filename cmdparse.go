@@ -24,13 +24,13 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 	case "let", "wlet":
 		stmnt = strings.TrimPrefix(stmnt, cmd)
-		splitStmnt := strings.SplitAfter(stmnt, "=")
+		splitStmnt := strings.SplitN(stmnt, "=", 2)
 
 		if len(splitStmnt) < 2 {
 			return cLCStatement{}, errors.New("no expression in " + cmd + " operation")
 		}
 
-		varname := strings.TrimSpace(strings.TrimSuffix(splitStmnt[0], "="))
+		varname := strings.TrimSpace(splitStmnt[0])
 		// \ should always become λ
 		varname = strings.Replace(varname, "\\", "λ", -1)
 
@@ -51,13 +51,13 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 
 	case "match":
 		stmnt = strings.TrimPrefix(stmnt, "match")
-		splitStmnt := strings.SplitAfter(stmnt, "with")
+		splitStmnt := strings.SplitN(stmnt, "with", 2)
 
 		if len(splitStmnt) < 2 {
 			return cLCStatement{}, errors.New("no targets in match operation")
 		}
 
-		expression, err := parseString(strings.TrimSuffix(splitStmnt[0], "with"), globals)
+		expression, err := parseString(splitStmnt[0], globals)
 		vars := strings.Fields(splitStmnt[1])
 
 		if len(vars) == 0 {

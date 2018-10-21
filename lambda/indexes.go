@@ -1,4 +1,4 @@
-package lamcalc
+package lambda
 
 // heightenIndex heightens the De Bruijn indexes by one where needed
 func heightenIndex(expr Term) Term {

@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/elecprog/lamcalc"
+	"github.com/elecprog/cLC/lambda"
 )
 
 type cLCStatement struct {
@@ -43,13 +43,13 @@ func executeStatement(stmnt cLCStatement) {
 		showInfo()
 
 	case "let", "wlet":
-		var rs lamcalc.Term
+		var rs lambda.Term
 		switch cmd {
 		case "wlet":
-			rs = stmnt.parameters[1].(lamcalc.Term).WHNF()
+			rs = stmnt.parameters[1].(lambda.Term).WHNF()
 
 		default:
-			rs = concurrentReduce(stmnt.parameters[1].(lamcalc.Term))
+			rs = concurrentReduce(stmnt.parameters[1].(lambda.Term))
 		}
 
 		if rs == nil {
@@ -60,21 +60,21 @@ func executeStatement(stmnt cLCStatement) {
 		globals[stmnt.parameters[0].(string)] = rs
 
 	case "match":
-		rs := concurrentReduce(stmnt.parameters[0].(lamcalc.Term))
+		rs := concurrentReduce(stmnt.parameters[0].(lambda.Term))
 
 		if rs == nil {
 			// Something went wrong
 			return
 		}
 
-		fmt.Print("\n" + stmnt.parameters[0].(lamcalc.Term).String() + " =\n")
+		fmt.Print("\n" + stmnt.parameters[0].(lambda.Term).String() + " =\n")
 
 		couldFold := false
 		for _, gvar := range stmnt.parameters[1].([]string) {
 			global, ok := globals[gvar]
 
 			if !ok {
-				global = lamcalc.Free(gvar)
+				global = lambda.Free(gvar)
 			}
 
 			if global.AlphaEquivalent(rs) {
@@ -93,14 +93,14 @@ func executeStatement(stmnt cLCStatement) {
 		loadFiles(stmnt.parameters[0].([]string))
 
 	case "show", "weak":
-		var rs lamcalc.Term
+		var rs lambda.Term
 
 		switch cmd {
 		case "weak":
-			rs = stmnt.parameters[0].(lamcalc.Term).WHNF()
+			rs = stmnt.parameters[0].(lambda.Term).WHNF()
 
 		default:
-			rs = concurrentReduce(stmnt.parameters[0].(lamcalc.Term))
+			rs = concurrentReduce(stmnt.parameters[0].(lambda.Term))
 		}
 
 		if rs == nil {
@@ -108,7 +108,7 @@ func executeStatement(stmnt cLCStatement) {
 			return
 		}
 
-		fmt.Print("\n" + stmnt.parameters[0].(lamcalc.Term).String() + " =\n\n")
+		fmt.Print("\n" + stmnt.parameters[0].(lambda.Term).String() + " =\n\n")
 		fmt.Print("    " + rs.String() + "\n\n")
 	}
 }

@@ -1,4 +1,4 @@
-package lamcalc
+package lambda
 
 import (
 	"strconv"

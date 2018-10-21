@@ -1,4 +1,4 @@
-package lamcalc
+package lambda
 
 // MaxReductions determines the maximum amount of expansions before we give up
 // use a negative value to have no limit (use with care...)

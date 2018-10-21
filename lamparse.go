@@ -4,18 +4,18 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/elecprog/lamcalc"
+	"github.com/elecprog/cLC/lambda"
 )
 
 // parseString turns the input into a Term
-func parseString(expr string, globals map[string]lamcalc.Term) (lamcalc.Term, error) {
+func parseString(expr string, globals map[string]lambda.Term) (lambda.Term, error) {
 	// Backslash is a notation for lambda
 	expr = strings.Replace(expr, "\\", "λ", -1)
 
-	return furtherParseString([]rune(expr), map[string]lamcalc.Var{}, globals)
+	return furtherParseString([]rune(expr), map[string]lambda.Var{}, globals)
 }
 
-func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals map[string]lamcalc.Term) (lamcalc.Term, error) {
+func furtherParseString(expr []rune, boundVars map[string]lambda.Var, globals map[string]lambda.Term) (lambda.Term, error) {
 	// Clean string
 	expr = []rune(strings.TrimSpace(string(expr)))
 
@@ -33,7 +33,7 @@ func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals m
 
 		// Create copy of boundVars where every index is one higher
 		oldVars := boundVars
-		boundVars = map[string]lamcalc.Var{}
+		boundVars = map[string]lambda.Var{}
 
 		// First increment the index of each bound variable
 		for variable := range oldVars {
@@ -66,10 +66,10 @@ func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals m
 			return nil, err
 		}
 
-		return lamcalc.Abst{part}, nil
+		return lambda.Abst{part}, nil
 	}
 
-	term := lamcalc.Appl{}
+	term := lambda.Appl{}
 
 	for i := 0; i < len(expr); i++ {
 		switch expr[i] {
@@ -85,7 +85,7 @@ func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals m
 			term[1] = part
 
 		case '(':
-			var cterm lamcalc.Term
+			var cterm lambda.Term
 
 			i++
 			starte := i
@@ -142,7 +142,7 @@ func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals m
 					term[1] = cfnc.Copy()
 
 				} else {
-					term[1] = lamcalc.Free(cvar)
+					term[1] = lambda.Free(cvar)
 				}
 			}
 		}
@@ -150,10 +150,10 @@ func furtherParseString(expr []rune, boundVars map[string]lamcalc.Var, globals m
 		// If the Appl is full: encapsulate it in a new one
 		if term[1] != nil {
 			if term[0] == nil { // First term wasn't added (happens after first element)
-				term = lamcalc.Appl{term[1]}
+				term = lambda.Appl{term[1]}
 
 			} else {
-				term = lamcalc.Appl{term}
+				term = lambda.Appl{term}
 			}
 		}
 	}
