@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"runtime/debug"
 
-	"github.com/ElecProg/lamcalc"
+	"github.com/elecprog/lamcalc"
 )
 
 func concurrentReduce(term lamcalc.Term) lamcalc.Term {

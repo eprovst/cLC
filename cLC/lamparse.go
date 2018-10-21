@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/ElecProg/lamcalc"
+	"github.com/elecprog/lamcalc"
 )
 
 // parseString turns the input into a Term

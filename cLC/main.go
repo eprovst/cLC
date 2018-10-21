@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ElecProg/lamcalc"
 	"github.com/chzyer/readline"
+	"github.com/elecprog/lamcalc"
 )
 
 var globals = map[string]lamcalc.Term{}
