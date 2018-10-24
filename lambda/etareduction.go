@@ -18,17 +18,19 @@ func (lf Free) containsVar(idx Var) bool {
 
 // EtaReduce applies eta-reduction to the Abst when possible
 func (la Abst) EtaReduce() Term {
-	switch body := la[0].(type) {
+	// First eta reduce the body
+	body := la[0].EtaReduce()
+
+	switch body := body.(type) {
 	case Appl:
 		if body[1] == Var(0) && !body[0].containsVar(0) {
-			// Index zero was not used anywhere else: do eta reduction
+			// Index zero was not used anywhere else: do eta reduction.
 			return lowerIndex(body[0].EtaReduce())
 		}
 	}
 
 	// Else we can't do etareduction
-	la[0] = la[0].EtaReduce()
-	return la
+	return body
 }
 
 // EtaReduce applies eta-reduction to the Appl when possible
