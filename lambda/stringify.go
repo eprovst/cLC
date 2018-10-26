@@ -23,34 +23,61 @@ func intToLetter(num int) string {
 	return "x" + strconv.Itoa(num-25)
 }
 
+func getFreeVariables(t Term) []Free {
+	switch t := t.(type) {
+	case Free:
+		return []Free{t}
+
+	case Appl:
+		return append(getFreeVariables(t[0]), getFreeVariables(t[1])...)
+
+	case Abst:
+		return getFreeVariables(t[0])
+
+	default:
+		return []Free{}
+	}
+}
+
+func in(t Free, f *[]Free) bool {
+	for _, v := range *f {
+		if t == v {
+			return true
+		}
+	}
+
+	return false
+}
+
 // String returns the Lambda Expression as a string
 func (lx Appl) String() string {
 	builder := strings.Builder{}
-	lx.deDeBruijn(&builder, new([]string), new(int))
+	freeVars := getFreeVariables(lx)
+	lx.deDeBruijn(&builder, new([]string), new(int), &freeVars)
 
 	return builder.String()
 }
 
-func (lx Appl) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int) {
+func (lx Appl) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int, freeVars *[]Free) {
 	for i, part := range lx {
 		switch part := part.(type) {
 		case Abst:
 			builder.WriteByte('(')
-			part.deDeBruijn(builder, boundLetters, nextletter)
+			part.deDeBruijn(builder, boundLetters, nextletter, freeVars)
 			builder.WriteByte(')')
 
 		case Appl:
 			if i == 0 {
-				part.deDeBruijn(builder, boundLetters, nextletter)
+				part.deDeBruijn(builder, boundLetters, nextletter, freeVars)
 
 			} else {
 				builder.WriteByte('(')
-				part.deDeBruijn(builder, boundLetters, nextletter)
+				part.deDeBruijn(builder, boundLetters, nextletter, freeVars)
 				builder.WriteByte(')')
 			}
 
 		default:
-			part.deDeBruijn(builder, boundLetters, nextletter)
+			part.deDeBruijn(builder, boundLetters, nextletter, freeVars)
 		}
 
 		// Put space between first and second part
@@ -63,25 +90,33 @@ func (lx Appl) deDeBruijn(builder *strings.Builder, boundLetters *[]string, next
 // String returns the lambda abstraction as a string
 func (la Abst) String() string {
 	builder := strings.Builder{}
-	la.deDeBruijn(&builder, new([]string), new(int))
+	freeVars := getFreeVariables(la)
+	la.deDeBruijn(&builder, new([]string), new(int), &freeVars)
 
 	return builder.String()
 }
 
-func (la Abst) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int) {
+func (la Abst) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int, freeVars *[]Free) {
 	// Remember at which character we were
 	oldNextLetter := *nextletter
 
-	// Add the localy bound letter to the list
+	// Search for a free name
 	newLetter := intToLetter(*nextletter)
 	*nextletter++
+
+	for in(Free(newLetter), freeVars) {
+		newLetter = intToLetter(*nextletter)
+		*nextletter++
+	}
+
+	// Add the localy bound letter to the list
 	*boundLetters = append([]string{newLetter}, *boundLetters...)
 
 	builder.WriteRune('λ')
 	builder.WriteString(newLetter)
 	builder.WriteByte('.')
 
-	la[0].deDeBruijn(builder, boundLetters, nextletter)
+	la[0].deDeBruijn(builder, boundLetters, nextletter, freeVars)
 
 	// Remove our local naming
 	*boundLetters = (*boundLetters)[1:]
@@ -94,20 +129,29 @@ func (lv Var) String() string {
 	return intToLetter(0)
 }
 
-func (lv Var) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int) {
+func (lv Var) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int, freeVars *[]Free) {
 	if int(lv) < len(*boundLetters) && (*boundLetters)[lv] != "" {
 		builder.WriteString((*boundLetters)[lv])
 		return
 	}
 
+	// Search for a free name
 	newLetter := intToLetter(*nextletter)
 	*nextletter++
 
+	for in(Free(newLetter), freeVars) {
+		newLetter = intToLetter(*nextletter)
+		*nextletter++
+	}
+
+	// Add it to the boundletters table
 	for i := len(*boundLetters); i < int(lv); i++ {
 		*boundLetters = append(*boundLetters, "")
 	}
 
 	*boundLetters = append(*boundLetters, newLetter)
+
+	// And finaly write it to output
 	builder.WriteString(newLetter)
 }
 
@@ -117,6 +161,6 @@ func (lf Free) String() string {
 	return string(lf)
 }
 
-func (lf Free) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int) {
+func (lf Free) deDeBruijn(builder *strings.Builder, boundLetters *[]string, nextletter *int, freeVars *[]Free) {
 	builder.WriteString(string(lf))
 }

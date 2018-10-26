@@ -14,7 +14,7 @@ type Term interface {
 	substitute(Var, Term) Term
 
 	String() string
-	deDeBruijn(*strings.Builder, *[]string, *int)
+	deDeBruijn(*strings.Builder, *[]string, *int, *[]Free)
 
 	Reduce() (Term, error)
 	NorReduce() (Term, error)
