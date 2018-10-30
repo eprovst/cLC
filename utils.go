@@ -44,7 +44,7 @@ func showInfo() {
           /     /\  (
           \__  /  \  \___
 
-commandline Lambda Calculator v1.3.0
+commandline Lambda Calculator v1.4.0
 ------------------------------------
 
 Copyright (c) 2017-2018 Evert Provoost.
