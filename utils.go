@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -13,8 +14,24 @@ func printError(err error) {
 
 func loadFiles(paths []string) {
 	for _, filePath := range paths {
+		// Get the current working directory
+		currentPath, err := os.Getwd()
+
+		if err != nil {
+			printError(err)
+			continue
+		}
+
+		// Open the file
 		file, err := os.Open(filePath)
 
+		if err != nil {
+			printError(err)
+			continue
+		}
+
+		// Go to the file's directory
+		err = os.Chdir(filepath.Dir(filePath))
 		if err != nil {
 			printError(err)
 
@@ -34,6 +51,13 @@ func loadFiles(paths []string) {
 
 			file.Close()
 			fmt.Println("Done loading '" + filePath + "'.")
+		}
+
+		// Go back to the original path
+		err = os.Chdir(currentPath)
+
+		if err != nil {
+			printError(err)
 		}
 	}
 }
