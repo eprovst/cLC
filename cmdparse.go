@@ -49,6 +49,19 @@ func parseStatement(stmnt string) (cLCStatement, error) {
 			parameters: []interface{}{varname, expression},
 		}, nil
 
+	case "free":
+		stmnt = strings.TrimPrefix(stmnt, "free")
+		vars := strings.Fields(stmnt)
+
+		if len(vars) == 0 {
+			return cLCStatement{}, errors.New("no targets in free operation")
+		}
+
+		return cLCStatement{
+			command:    "free",
+			parameters: []interface{}{vars},
+		}, nil
+
 	case "match":
 		stmnt = strings.TrimPrefix(stmnt, "match")
 		splitStmnt := strings.SplitN(stmnt, "with", 2)

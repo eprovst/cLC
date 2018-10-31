@@ -92,6 +92,9 @@ Availabe commands:
 let <new global> = <lambda expression>
 → If the expansion can be fully reduced sets the global equal to that reduced form.
 
+free <global1> <global2> <...>
+→ Unbinds the global(s) and thus makes it a free variable.
+
 match <lambda expression> with <global1> <global2> <...>
 → Tries to fully expand the expression and then shows the first listed global variable which is equivalent to that reduction.
 
