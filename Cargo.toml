@@ -1,7 +1,10 @@
 [package]
-name = "cLC"
+name = "lambdacalc"
 version = "1.4.0"
 edition = "2018"
 authors = ["Evert Provoost <evert.provoost@gmail.com>"]
 
 [dependencies]
+
+[[bin]]
+name = "cLC"

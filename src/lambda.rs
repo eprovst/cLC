@@ -261,7 +261,7 @@ fn variable_to_letter(i: usize) -> String {
 struct FormatEnvironment<'a> {
     variable_offset: usize,
     variables: &'a mut HashMap<usize, String>,
-    free_variables: &'a mut HashSet<String>,
+    free_variables: &'a HashSet<String>,
     next_variable: usize,
 }
 

@@ -1,6 +1,5 @@
-mod lambda;
-
-use lambda::LambdaTerm::*;
+#![allow(non_snake_case)]
+use lambdacalc::lambda::LambdaTerm::*;
 
 fn main() {
     let mut lam = Application(
