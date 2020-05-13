@@ -1,12 +1,10 @@
 #![allow(non_snake_case)]
-use lambdacalc::lambda::LambdaTerm::*;
+use lambdacalc::parser::parse_lambda_term;
+use std::collections::HashMap;
 
 fn main() {
-    let mut lam = Application(
-        Box::new(Abstraction(Box::new(BoundVariable(0)))),
-        Box::new(Abstraction(Box::new(FreeVariable(String::from("a"))))),
-    );
+    let mut lam = parse_lambda_term("(\\a.c a b) c", &HashMap::new()).unwrap();
     println!("{}", lam);
-    lam.beta_reduce();
+    lam.normal_order_reduce();
     println!("{}", lam);
 }

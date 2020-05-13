@@ -284,7 +284,7 @@ fn fmt_aux(
                 fmt_aux(x, env, f)?;
             }
             f.write_str(" ")?;
-            if let Abstraction(_) = **x {
+            if let Abstraction(_) = **y {
                 f.write_str("(")?;
                 fmt_aux(y, env, f)?;
                 f.write_str(")")

@@ -1,3 +1,5 @@
+// TODO: detect bracket borders without space...
+
 use std::collections::HashMap;
 
 use super::lambda::{LambdaTerm, LambdaTerm::*};
@@ -7,39 +9,89 @@ struct ParsingEnvironment<'a> {
     constants: &'a HashMap<String, LambdaTerm>,
 }
 
-fn skip_space(i: &str) -> &str {
-    i.trim_start()
+fn trim_braces_and_space(i: &str) -> &str {
+    let i = i.trim();
+
+    if i.starts_with('(') {
+        if let Ok((inner, "")) = parse_braces_r(i) {
+            trim_braces_and_space(inner)
+        } else {
+            i
+        }
+    } else {
+        i
+    }
 }
 
 fn split_at(sep: char, i: &str) -> Result<(&str, &str), &'static str> {
+    let i = i.trim();
+
     let mut iter = i.splitn(2, sep);
 
     if let (Some(l), Some(r)) = (iter.next(), iter.next()) {
         Ok((l, r))
     } else {
-        Err("Can't split at whitespace.")
+        Err("Missing character.")
     }
 }
 
-// TODO: should gobble whitespace...
-fn split_space(i: &str) -> Result<(&str, &str), &'static str> {
+fn split_space(i: &str) -> (&str, &str) {
+    let i = i.trim();
+
     let mut iter = i.splitn(2, |c: char| c.is_whitespace());
 
     if let (Some(l), Some(r)) = (iter.next(), iter.next()) {
-        Ok((l, r))
+        (l, r.trim_start())
     } else {
-        Err("Can't split at whitespace.")
+        (i, "")
     }
 }
 
-// TODO
-fn parse_braces(i: &str) -> Result<(&str, &str), &'static str> {
-    Ok((i, ""))
+fn split_space_r(i: &str) -> (&str, &str) {
+    let i = i.trim();
+
+    let mut iter = i.rsplitn(2, |c: char| c.is_whitespace());
+
+    if let (Some(r), Some(l)) = (iter.next(), iter.next()) {
+        (l.trim_end(), r)
+    } else {
+        (i, "")
+    }
+}
+
+fn parse_braces_r(i: &str) -> Result<(&str, &str), &'static str> {
+    let i = i.trim();
+
+    if i.ends_with(')') {
+        let mut iter = i.char_indices().rev();
+        iter.next();
+
+        let mut opens = 1;
+        while opens > 0 {
+            match iter.next() {
+                Some((_, ')')) => opens += 1,
+                Some((_, '(')) => opens -= 1,
+                None => return Err("Unbalanced brackets."),
+                _ => {}
+            }
+        }
+
+        match iter.next() {
+            Some((idx, _)) => {
+                let (l, r) = i.split_at(idx + 1);
+                Ok((l, &r[1..r.len() - 1]))
+            }
+            None => Ok((&i[1..i.len() - 1], "")),
+        }
+    } else {
+        Err("No bracket found.")
+    }
 }
 
 fn parse_identifier<'a>(i: &'a str) -> Result<(&'a str, &'a str), &'static str> {
-    let (i, rem) = split_space(i)?;
-    let i = trim_braces_and_space(i);
+    let i = i.trim();
+
+    let (i, rem) = split_space(i);
 
     if i.is_empty() {
         Err("Expected variable.")
@@ -56,6 +108,8 @@ fn parse_variable<'a>(
     i: &'a str,
     env: &ParsingEnvironment,
 ) -> Result<(LambdaTerm, &'a str), &'static str> {
+    let i = trim_braces_and_space(i);
+
     let (i, rem) = parse_identifier(i)?;
 
     match env.bound_variables.iter().rposition(|x| *x == i) {
@@ -67,23 +121,34 @@ fn parse_variable<'a>(
     }
 }
 
-// TODO
 fn parse_abstraction<'a>(
     i: &'a str,
     env: &mut ParsingEnvironment,
 ) -> Result<(LambdaTerm, &'a str), &'static str> {
+    let i = trim_braces_and_space(i);
+
     if i.starts_with('\\') || i.starts_with('λ') {
         // TODO: in future, use strip_prefix
         let mut iter = i.chars();
         iter.next();
         let i = iter.as_str();
 
-        let (var, rem) = parse_identifier(i)?;
-        env.bound_variables.push(var.to_string());
-        // TODO: parse remainder
-        env.bound_variables.pop();
+        let (param, body) = split_at('.', i)?;
 
-        Ok((BoundVariable(0), rem))
+        // TODO: allow multiple parameters
+        let param = param.trim_start();
+        let (var, rem) = parse_identifier(param)?;
+
+        if rem.is_empty() {
+            env.bound_variables.push(var.to_string());
+            let res = parse_term(body, env);
+            env.bound_variables.pop();
+
+            let (body, rem) = res?;
+            Ok((Abstraction(Box::new(body)), rem))
+        } else {
+            Err("Superfluous characters in parameter list.")
+        }
     } else {
         Err("Abstraction should start with λ or \\.")
     }
@@ -93,52 +158,56 @@ fn parse_application<'a>(
     i: &'a str,
     env: &mut ParsingEnvironment,
 ) -> Result<(LambdaTerm, &'a str), &'static str> {
-    let (i, s) = if i.starts_with('(') {
-        parse_braces(i)?
+    let i = trim_braces_and_space(i);
+
+    let (i, s) = if i.ends_with(')') {
+        parse_braces_r(i)?
     } else {
-        split_space(i)?
+        split_space_r(i)
     };
 
-    let fst = parse_full_term(i, env)?;
-    let (snd, rem) = parse_term(s, env)?;
+    let s = s.trim_start();
 
-    Ok((Application(Box::new(fst), Box::new(snd)), rem))
+    if !s.is_empty() {
+        let fst = parse_full_term(i, env)?;
+        let (snd, rem) = parse_term(s, env)?;
+
+        Ok((Application(Box::new(fst), Box::new(snd)), rem))
+    } else {
+        Err("No argument in application.")
+    }
 }
 
-// TODO
 fn parse_term<'a>(
     i: &'a str,
     env: &mut ParsingEnvironment,
 ) -> Result<(LambdaTerm, &'a str), &'static str> {
-    if i.starts_with('(') {
-        let (i, s) = parse_braces(i)?;
-        let res = parse_full_term(i, env)?;
-        Ok((res, s))
-    } else {
-        // TODO
-        Ok((BoundVariable(0), ""))
-    }
-}
-
-fn trim_braces_and_space(i: &str) -> &str {
-    let mut i = i.trim();
-    while i.starts_with('(') && i.ends_with(')') {
-        i = i.trim_start_matches('(').trim_end_matches(')');
-        i = i.trim();
-    }
-    i
+    parse_abstraction(i, env)
+        .or_else(|_| parse_application(i, env))
+        .or_else(|_| parse_variable(i, env))
 }
 
 fn parse_full_term<'a>(
     i: &'a str,
     env: &mut ParsingEnvironment,
 ) -> Result<LambdaTerm, &'static str> {
-    let i = trim_braces_and_space(i);
     let (res, rem) = parse_term(i, env)?;
 
-    if rem.is_empty() {
+    if rem.trim().is_empty() {
         Ok(res)
     } else {
         Err("Superfluous characters.")
     }
+}
+
+#[allow(clippy::implicit_hasher)]
+pub fn parse_lambda_term(
+    i: &str,
+    constants: &HashMap<String, LambdaTerm>,
+) -> Result<LambdaTerm, &'static str> {
+    let mut env = ParsingEnvironment {
+        bound_variables: &mut Vec::new(),
+        constants,
+    };
+    parse_full_term(i, &mut env)
 }
