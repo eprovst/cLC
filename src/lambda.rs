@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use std::mem;
 use std::ptr;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum LambdaTerm {
     BoundVariable(usize),
     FreeVariable(String),
@@ -13,7 +13,6 @@ pub enum LambdaTerm {
 
 use self::LambdaTerm::*;
 
-#[allow(dead_code)] // TODO: remove in the future
 impl LambdaTerm {
     pub fn alpha_eq(&self, other: &LambdaTerm) -> bool {
         match self {
@@ -272,9 +271,10 @@ fn fmt_aux(
 ) -> Result<(), std::fmt::Error> {
     match term {
         FreeVariable(v) => f.write_str(v),
-        BoundVariable(i) => {
-            f.write_str(env.variables.get(&(*i + env.variable_offset - 1)).unwrap())
-        }
+        BoundVariable(i) => match env.variables.get(&(env.variable_offset - *i - 1)) {
+            Some(var) => f.write_str(var),
+            None => Err(std::fmt::Error),
+        },
         Application(x, y) => {
             if let Abstraction(_) = **x {
                 f.write_str("(")?;
@@ -284,7 +284,7 @@ fn fmt_aux(
                 fmt_aux(x, env, f)?;
             }
             f.write_str(" ")?;
-            if let Abstraction(_) = **y {
+            if let Abstraction(_) | Application(_, _) = **y {
                 f.write_str("(")?;
                 fmt_aux(y, env, f)?;
                 f.write_str(")")
@@ -302,6 +302,7 @@ fn fmt_aux(
                 env.next_variable += 1;
                 var = variable_to_letter(env.next_variable);
             }
+            env.next_variable += 1;
 
             f.write_str(var.as_str())?;
             env.variables.insert(env.variable_offset, var);

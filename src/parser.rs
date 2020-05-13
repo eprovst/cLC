@@ -110,7 +110,7 @@ fn parse_variable<'a>(
 
     let (i, rem) = parse_identifier(i)?;
 
-    match env.bound_variables.iter().rposition(|x| *x == i) {
+    match env.bound_variables.iter().rev().position(|x| *x == i) {
         Some(idx) => Ok((BoundVariable(idx), rem)),
         None => match env.constants.get(&i.to_string()) {
             Some(cons) => Ok((cons.clone(), rem)),

@@ -5,6 +5,7 @@ edition = "2018"
 authors = ["Evert Provoost <evert.provoost@gmail.com>"]
 
 [dependencies]
+rustyline = "6.1.2"
 
 [[bin]]
 name = "cLC"
