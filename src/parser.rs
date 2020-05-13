@@ -35,24 +35,22 @@ fn split_at(sep: char, i: &str) -> Result<(&str, &str), &'static str> {
     }
 }
 
-fn split_space(i: &str) -> (&str, &str) {
+fn split_blob(i: &str) -> (&str, &str) {
     let i = i.trim();
 
-    let mut iter = i.splitn(2, |c: char| c.is_whitespace());
-
-    if let (Some(l), Some(r)) = (iter.next(), iter.next()) {
+    if let Some(idx) = i.find(|c: char| c.is_whitespace() || c == '(') {
+        let (l, r) = i.split_at(idx);
         (l, r.trim_start())
     } else {
         (i, "")
     }
 }
 
-fn split_space_r(i: &str) -> (&str, &str) {
+fn split_blob_r(i: &str) -> (&str, &str) {
     let i = i.trim();
 
-    let mut iter = i.rsplitn(2, |c: char| c.is_whitespace());
-
-    if let (Some(r), Some(l)) = (iter.next(), iter.next()) {
+    if let Some(idx) = i.rfind(|c: char| c.is_whitespace() || c == ')') {
+        let (l, r) = i.split_at(idx + 1);
         (l.trim_end(), r)
     } else {
         (i, "")
@@ -91,7 +89,7 @@ fn parse_braces_r(i: &str) -> Result<(&str, &str), &'static str> {
 fn parse_identifier<'a>(i: &'a str) -> Result<(&'a str, &'a str), &'static str> {
     let i = i.trim();
 
-    let (i, rem) = split_space(i);
+    let (i, rem) = split_blob(i);
 
     if i.is_empty() {
         Err("Expected variable.")
@@ -163,7 +161,7 @@ fn parse_application<'a>(
     let (i, s) = if i.ends_with(')') {
         parse_braces_r(i)?
     } else {
-        split_space_r(i)
+        split_blob_r(i)
     };
 
     let s = s.trim_start();
