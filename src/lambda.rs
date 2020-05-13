@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::mem;
 use std::ptr;
 
@@ -32,6 +33,23 @@ impl LambdaTerm {
                 Abstraction(y) => x.alpha_eq(y),
                 _ => false,
             },
+        }
+    }
+
+    fn free_variables(&self) -> HashSet<String> {
+        match self {
+            BoundVariable(_) => HashSet::with_capacity(0),
+            FreeVariable(x) => {
+                let mut set = HashSet::with_capacity(1);
+                set.insert(x.clone());
+                set
+            }
+            Application(x1, x2) => {
+                let left_vars = x1.free_variables();
+                let right_vars = x2.free_variables();
+                left_vars.union(&right_vars).cloned().collect()
+            }
+            Abstraction(x) => x.free_variables(),
         }
     }
 
@@ -243,10 +261,10 @@ fn variable_to_letter(i: usize) -> String {
 struct FormatEnvironment<'a> {
     variable_offset: usize,
     variables: &'a mut HashMap<usize, String>,
+    free_variables: &'a mut HashSet<String>,
     next_variable: usize,
 }
 
-// TODO: avoid collisions with free variables
 fn fmt_aux(
     term: &LambdaTerm,
     env: &mut FormatEnvironment,
@@ -277,19 +295,25 @@ fn fmt_aux(
         Abstraction(x) => {
             f.write_str("λ")?;
 
-            let var = variable_to_letter(env.next_variable);
+            // Seach for variable that can be used
+            let old_next_variable = env.next_variable;
+            let mut var = variable_to_letter(env.next_variable);
+            while env.free_variables.contains(&var) {
+                env.next_variable += 1;
+                var = variable_to_letter(env.next_variable);
+            }
+
             f.write_str(var.as_str())?;
             env.variables.insert(env.variable_offset, var);
 
             f.write_str(".")?;
 
             env.variable_offset += 1;
-            env.next_variable += 1;
             fmt_aux(x, env, f)?;
             env.variable_offset -= 1;
-            env.next_variable -= 1;
 
             env.variables.remove(&env.variable_offset);
+            env.next_variable = old_next_variable;
             Ok(())
         }
     }
@@ -300,6 +324,7 @@ impl std::fmt::Display for LambdaTerm {
         let mut env = FormatEnvironment {
             variable_offset: 0,
             variables: &mut HashMap::<usize, String>::new(),
+            free_variables: &mut self.free_variables(),
             next_variable: 0,
         };
         fmt_aux(self, &mut env, f)
