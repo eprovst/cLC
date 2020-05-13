@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::mem;
+use std::ptr;
 
 #[derive(Clone)]
 pub enum LambdaTerm {
@@ -10,6 +12,7 @@ pub enum LambdaTerm {
 
 use self::LambdaTerm::*;
 
+#[allow(dead_code)] // TODO: remove in the future
 impl LambdaTerm {
     pub fn alpha_eq(&self, other: &LambdaTerm) -> bool {
         match self {
@@ -68,6 +71,7 @@ impl LambdaTerm {
                 }
             }
             Application(x1, x2) => {
+                // TODO: optimise clone away in obvious cases.
                 x1.substitute(variable, other.clone());
                 x2.substitute(variable, other);
             }
@@ -80,13 +84,19 @@ impl LambdaTerm {
     }
 
     pub fn beta_reduce(&mut self) {
-        // TODO: can we get rid of the clones...
-        if let Application(x, y) = self {
-            if let Abstraction(ref mut z) = **x {
-                y.heighten_index();
-                z.substitute(0, *y.clone());
-                *self = *z.clone();
-                self.lower_index();
+        if let Application(abstr, arg_d) = self {
+            if let Abstraction(ref mut body_d) = **abstr {
+                // Create cheap objects to be destroyed together with the
+                // application and abstraction and save the relevant bits.
+                let mut arg = Box::new(BoundVariable(0));
+                mem::swap(&mut arg, arg_d);
+                let mut body = Box::new(BoundVariable(0));
+                mem::swap(&mut body, body_d);
+
+                arg.heighten_index();
+                body.substitute(0, *arg);
+                body.lower_index();
+                *self = *body;
             }
         }
     }
@@ -101,7 +111,6 @@ impl LambdaTerm {
     }
 
     pub fn eta_reduce(&mut self) {
-        // TODO: get rid of clone
         match self {
             Application(x, y) => {
                 x.eta_reduce();
@@ -110,12 +119,17 @@ impl LambdaTerm {
             Abstraction(x) => {
                 x.eta_reduce();
 
-                if let Application(ref mut y, ref z) = **x {
+                if let Application(ref mut body_d, ref z) = **x {
                     if let BoundVariable(0) = **z {
-                        if !y.contains(0) {
-                            y.eta_reduce();
-                            y.lower_index();
-                            *self = *y.clone();
+                        if !body_d.contains(0) {
+                            // Create cheap objects to be destroyed with the
+                            // application and save the relevant bits.
+                            let mut body = Box::new(BoundVariable(0));
+                            mem::swap(&mut body, body_d);
+
+                            body.eta_reduce();
+                            body.lower_index();
+                            *self = *body;
                         }
                     }
                 }
@@ -125,14 +139,18 @@ impl LambdaTerm {
     }
 
     pub fn whnf(&mut self) {
-        // TODO: get rid of clone
-        match self {
-            Abstraction(_) => {}
-            _ => {
-                *self = Abstraction(Box::new(Application(
-                    Box::new(self.clone()),
-                    Box::new(BoundVariable(0)),
-                )))
+        if let Abstraction(_) = self {
+            // Already in WHNF.
+        } else {
+            unsafe {
+                let body = ptr::read(self);
+                ptr::write(
+                    self,
+                    Abstraction(Box::new(Application(
+                        Box::new(body),
+                        Box::new(BoundVariable(0)),
+                    ))),
+                );
             }
         }
     }
@@ -222,44 +240,68 @@ fn variable_to_letter(i: usize) -> String {
     }
 }
 
-impl LambdaTerm {
-    fn sub_fmt(
-        &self,
-        variable_offset: usize,
-        variables: &mut HashMap<usize, String>,
-        next_variable: &mut usize,
-        f: &mut std::fmt::Formatter,
-    ) -> Result<(), std::fmt::Error> {
-        match self {
-            FreeVariable(v) => f.write_str(v),
-            BoundVariable(i) => f.write_str(variable_to_letter(*i).as_str()),
-            Application(x, y) => {
-                if let Abstraction(_) = **x {
-                    f.write_str("(");
-                    x.sub_fmt(variable_offset, variables, next_variable, f);
-                    f.write_str(")");
-                } else {
-                    x.sub_fmt(variable_offset, variables, next_variable, f);
-                }
-                f.write_str(" ");
-                y.sub_fmt(variable_offset, variables, next_variable, f)
+struct FormatEnvironment<'a> {
+    variable_offset: usize,
+    variables: &'a mut HashMap<usize, String>,
+    next_variable: usize,
+}
+
+// TODO: avoid collisions with free variables
+fn fmt_aux(
+    term: &LambdaTerm,
+    env: &mut FormatEnvironment,
+    f: &mut std::fmt::Formatter,
+) -> Result<(), std::fmt::Error> {
+    match term {
+        FreeVariable(v) => f.write_str(v),
+        BoundVariable(i) => {
+            f.write_str(env.variables.get(&(*i + env.variable_offset - 1)).unwrap())
+        }
+        Application(x, y) => {
+            if let Abstraction(_) = **x {
+                f.write_str("(")?;
+                fmt_aux(x, env, f)?;
+                f.write_str(")")?;
+            } else {
+                fmt_aux(x, env, f)?;
             }
-            Abstraction(x) => {
-                f.write_str("λ");
-                let var = variable_to_letter(*next_variable);
-                f.write_str(var.as_str());
-                variables.insert(variable_offset, var);
-                *next_variable += 1;
-                f.write_str(".");
-                x.sub_fmt(variable_offset + 1, variables, next_variable, f)
+            f.write_str(" ")?;
+            if let Abstraction(_) = **x {
+                f.write_str("(")?;
+                fmt_aux(y, env, f)?;
+                f.write_str(")")
+            } else {
+                fmt_aux(y, env, f)
             }
+        }
+        Abstraction(x) => {
+            f.write_str("λ")?;
+
+            let var = variable_to_letter(env.next_variable);
+            f.write_str(var.as_str())?;
+            env.variables.insert(env.variable_offset, var);
+
+            f.write_str(".")?;
+
+            env.variable_offset += 1;
+            env.next_variable += 1;
+            fmt_aux(x, env, f)?;
+            env.variable_offset -= 1;
+            env.next_variable -= 1;
+
+            env.variables.remove(&env.variable_offset);
+            Ok(())
         }
     }
 }
 
 impl std::fmt::Display for LambdaTerm {
-    // Format highest level:
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        self.sub_fmt(0, &mut HashMap::<usize, String>::new(), &mut 0, f)
+        let mut env = FormatEnvironment {
+            variable_offset: 0,
+            variables: &mut HashMap::<usize, String>::new(),
+            next_variable: 0,
+        };
+        fmt_aux(self, &mut env, f)
     }
 }
