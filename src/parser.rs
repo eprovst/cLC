@@ -86,17 +86,20 @@ fn parse_braces_r(i: &str) -> Result<(&str, &str), &'static str> {
     }
 }
 
+pub fn is_valid_identifier(i: &str) -> bool {
+    !i.is_empty()
+        && !i.starts_with('\\')
+        && !i.starts_with('λ')
+        && !i.chars().any(|c| c.is_whitespace() || c == '(' || c == ')')
+}
+
 fn parse_identifier<'a>(i: &'a str) -> Result<(&'a str, &'a str), &'static str> {
     let i = i.trim();
 
     let (i, rem) = split_blob(i);
 
-    if i.is_empty() {
-        Err("Expected variable.")
-    } else if i.starts_with('\\') || i.starts_with('λ') {
-        Err("Variable can't start with lambda.")
-    } else if i.chars().any(|c| c.is_whitespace() || c == '(' || c == ')') {
-        Err("Variable can't contain whitespace or braces.")
+    if !is_valid_identifier(i) {
+        Err("Invalid variable.")
     } else {
         Ok((i, rem))
     }
