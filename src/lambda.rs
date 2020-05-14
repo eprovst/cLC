@@ -172,7 +172,7 @@ impl LambdaTerm {
         }
     }
 
-    fn can_reduce(&self) -> bool {
+    pub fn can_reduce(&self) -> bool {
         match self {
             BoundVariable(_) => false,
             FreeVariable(_) => false,
@@ -184,7 +184,7 @@ impl LambdaTerm {
         }
     }
 
-    fn normal_order_reduce_once(&mut self) {
+    pub fn normal_order_reduce_once(&mut self) {
         match self {
             Application(x, y) => {
                 if let Abstraction(_) = **x {
@@ -212,7 +212,7 @@ impl LambdaTerm {
         self.eta_reduce()
     }
 
-    fn applicative_order_reduce_once(&mut self) {
+    pub fn applicative_order_reduce_once(&mut self) {
         match self {
             Application(x, y) => {
                 if y.can_reduce() {

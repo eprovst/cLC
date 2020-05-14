@@ -5,6 +5,8 @@ edition = "2018"
 authors = ["Evert Provoost <evert.provoost@gmail.com>"]
 
 [dependencies]
+crossbeam-channel = "0.4.2"
+ctrlc = "3.1.4"
 rustyline = "6.1.2"
 
 [[bin]]
