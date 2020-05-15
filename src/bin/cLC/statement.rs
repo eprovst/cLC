@@ -241,7 +241,7 @@ fn reduce(term: &LambdaTerm, ctrlc_channel: &Receiver<()>) -> Result<LambdaTerm,
     thread::spawn(move || {
         while a_term.can_reduce() {
             match abt_arx.try_recv() {
-                Err(TryRecvError::Empty) => a_term.normal_order_reduce_once(),
+                Err(TryRecvError::Empty) => a_term.applicative_order_reduce_once(),
                 Ok(_) | Err(TryRecvError::Disconnected) => return,
             }
         }

@@ -87,11 +87,18 @@ impl LambdaTerm {
                     *self = other
                 }
             }
-            Application(x1, x2) => {
-                // TODO: optimise clone away in obvious cases.
-                x1.substitute(variable, other.clone());
-                x2.substitute(variable, other);
-            }
+            Application(x1, x2) => match **x1 {
+                FreeVariable(_) => x2.substitute(variable, other),
+                BoundVariable(v) if v != variable => x2.substitute(variable, other),
+                _ => match **x2 {
+                    FreeVariable(_) => x1.substitute(variable, other),
+                    BoundVariable(v) if v != variable => x1.substitute(variable, other),
+                    _ => {
+                        x1.substitute(variable, other.clone());
+                        x2.substitute(variable, other);
+                    }
+                },
+            },
             Abstraction(x) => {
                 other.heighten_index();
                 x.substitute(variable + 1, other);
@@ -225,7 +232,7 @@ impl LambdaTerm {
             }
             Abstraction(x) => {
                 if x.can_reduce() {
-                    x.normal_order_reduce_once();
+                    x.applicative_order_reduce_once();
                 }
             }
             _ => {}
