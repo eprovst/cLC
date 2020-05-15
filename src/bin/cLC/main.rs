@@ -4,6 +4,8 @@ use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use statement::{parse_statement, Statement};
 use std::collections::HashMap;
+use std::env;
+use std::path::PathBuf;
 
 mod statement;
 
@@ -18,6 +20,13 @@ fn main() {
     let mut env = HashMap::new();
 
     Statement::Info.execute(&ctrlc_channel, &mut env);
+
+    let args: Vec<String> = env::args().skip(1).collect();
+    if !args.is_empty() {
+        Statement::Load(args.iter().map(PathBuf::from).collect()).execute(&ctrlc_channel, &mut env);
+        println!("Switching to interactive mode...\n");
+    }
+
     loop {
         let readline = rl.readline("(cLC) ");
         match readline {

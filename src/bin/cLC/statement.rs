@@ -3,6 +3,10 @@ use crossbeam_channel::{bounded, select, Receiver, TryRecvError};
 use lambdacalc::lambda::LambdaTerm;
 use lambdacalc::parser::{is_valid_identifier, parse_lambda_term};
 use std::collections::HashMap;
+use std::env;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use std::path::PathBuf;
 use std::thread;
 
 pub enum Statement {
@@ -10,7 +14,7 @@ pub enum Statement {
     Exit,
     Help,
     Info,
-    //TODO: Load(String),
+    Load(Vec<PathBuf>),
     Reduce(LambdaTerm),
     Weak(LambdaTerm),
     Let(String, LambdaTerm),
@@ -19,6 +23,8 @@ pub enum Statement {
     Match(LambdaTerm, Vec<String>),
 }
 
+// It isn't that bad, is it?
+#[allow(clippy::cognitive_complexity)]
 pub fn parse_statement(
     inpt: &str,
     env: &HashMap<String, LambdaTerm>,
@@ -100,6 +106,14 @@ pub fn parse_statement(
             Ok(term) => Ok(Weak(term)),
             Err(error) => Err(error),
         }
+    } else if inpt.starts_with("load") {
+        let inpt = &inpt[4..].trim(); // TODO: replace with strip_prefix
+        let paths: Vec<PathBuf> = inpt.split_whitespace().map(PathBuf::from).collect();
+        if paths.is_empty() {
+            Err("No files given.")
+        } else {
+            Ok(Load(paths))
+        }
     } else {
         match parse_lambda_term(inpt, env) {
             Ok(term) => Ok(Reduce(term)),
@@ -172,6 +186,31 @@ impl Statement {
                         println!();
                     }
                     Err(error) => println!("{}", error),
+                }
+            }
+            Load(paths) => {
+                for path in paths {
+                    if path.is_file() {
+                        if let Ok(file) = File::open(&path) {
+                            let old_wd = env::current_dir();
+                            path.parent().map(env::set_current_dir);
+                            let reader = BufReader::new(file);
+                            for line in reader.lines() {
+                                if let Ok(line) = line {
+                                    match parse_statement(&line, env) {
+                                        Ok(stmt) => stmt.execute(ctrlc_channel, env),
+                                        Err(error) => println!("{}", error),
+                                    }
+                                }
+                            }
+                            let _ = old_wd.and_then(env::set_current_dir);
+                            println!("Done loading {:?}.", path);
+                        } else {
+                            println!("Failed to load file.");
+                        }
+                    } else {
+                        println!("File does not exist.");
+                    }
                 }
             }
         }
