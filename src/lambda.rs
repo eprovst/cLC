@@ -1,4 +1,4 @@
-// TODO: tail call optimisation
+// TODO: use become keyword once it is finally added
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -82,6 +82,15 @@ impl LambdaTerm {
         self.shift_index(false, 1);
     }
 
+    fn will_substitute(&self, variable: usize) -> bool {
+        match self {
+            BoundVariable(x) => *x == variable,
+            FreeVariable(_) => false,
+            Application(x1, x2) => x1.will_substitute(variable) || x2.will_substitute(variable),
+            Abstraction(x) => x.will_substitute(variable + 1),
+        }
+    }
+
     fn substitute(&mut self, variable: usize, mut other: LambdaTerm) {
         match self {
             BoundVariable(x) => {
@@ -89,23 +98,23 @@ impl LambdaTerm {
                     *self = other
                 }
             }
-            Application(x1, x2) => match **x1 {
-                FreeVariable(_) => x2.substitute(variable, other),
-                BoundVariable(v) if v != variable => x2.substitute(variable, other),
-                _ => match **x2 {
-                    FreeVariable(_) => x1.substitute(variable, other),
-                    BoundVariable(v) if v != variable => x1.substitute(variable, other),
-                    _ => {
-                        x1.substitute(variable, other.clone());
-                        x2.substitute(variable, other);
-                    }
-                },
-            },
-            Abstraction(x) => {
-                other.heighten_index();
-                x.substitute(variable + 1, other);
+            FreeVariable(_) => {}
+            Application(x1, x2) => {
+                if !x1.will_substitute(variable) {
+                    x2.substitute(variable, other);
+                } else if !x2.will_substitute(variable) {
+                    x1.substitute(variable, other);
+                } else {
+                    x1.substitute(variable, other.clone());
+                    x2.substitute(variable, other);
+                }
             }
-            _ => {}
+            Abstraction(x) => {
+                if x.will_substitute(variable + 1) {
+                    other.heighten_index();
+                    x.substitute(variable + 1, other);
+                }
+            }
         }
     }
 
