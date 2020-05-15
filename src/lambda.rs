@@ -1,3 +1,5 @@
+// TODO: tail call optimisation
+
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::mem;

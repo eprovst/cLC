@@ -1,5 +1,3 @@
-// TODO: detect bracket borders without space...
-
 use std::collections::HashMap;
 
 use super::lambda::{LambdaTerm, LambdaTerm::*};
@@ -38,7 +36,7 @@ fn split_at(sep: char, i: &str) -> Result<(&str, &str), &'static str> {
 fn split_blob(i: &str) -> (&str, &str) {
     let i = i.trim();
 
-    if let Some(idx) = i.find(|c: char| c.is_whitespace() || c == '(') {
+    if let Some(idx) = i.find(|c: char| c.is_whitespace() || c == '(' || c == '\\' || c == 'λ') {
         let (l, r) = i.split_at(idx);
         (l, r.trim_start())
     } else {
@@ -46,14 +44,35 @@ fn split_blob(i: &str) -> (&str, &str) {
     }
 }
 
-fn split_blob_r(i: &str) -> (&str, &str) {
+fn get_last_group(i: &str) -> Result<(&str, &str), &'static str> {
     let i = i.trim();
 
-    if let Some(idx) = i.rfind(|c: char| c.is_whitespace() || c == ')') {
-        let (l, r) = i.split_at(idx + 1);
-        (l.trim_end(), r)
+    // Is it an abstraction?
+    let mut opens = 0;
+    for (idx, c) in i.char_indices() {
+        match c {
+            '(' => opens += 1,
+            ')' => opens -= 1,
+            'λ' | '\\' => {
+                if opens == 0 {
+                    return Ok(i.split_at(idx));
+                }
+            }
+            _ => {}
+        }
+    }
+
+    if i.ends_with(')') {
+        // It is in brackets.
+        parse_braces_r(i)
     } else {
-        (i, "")
+        // It is not in brackets.
+        if let Some(idx) = i.rfind(|c: char| c.is_whitespace() || c == ')') {
+            let (l, r) = i.split_at(idx + 1);
+            Ok((l.trim_end(), r))
+        } else {
+            Ok((i, ""))
+        }
     }
 }
 
@@ -161,19 +180,14 @@ fn parse_application<'a>(
 ) -> Result<(LambdaTerm, &'a str), &'static str> {
     let i = trim_braces_and_space(i);
 
-    let (i, s) = if i.ends_with(')') {
-        parse_braces_r(i)?
-    } else {
-        split_blob_r(i)
-    };
+    let (i, s) = get_last_group(i)?;
 
     let s = s.trim_start();
-
     if !s.is_empty() {
         let fst = parse_full_term(i, env)?;
-        let (snd, rem) = parse_term(s, env)?;
+        let snd = parse_full_term(s, env)?;
 
-        Ok((Application(Box::new(fst), Box::new(snd)), rem))
+        Ok((Application(Box::new(fst), Box::new(snd)), ""))
     } else {
         Err("No argument in application.")
     }
