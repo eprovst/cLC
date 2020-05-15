@@ -15,8 +15,8 @@ pub enum Statement {
     Weak(LambdaTerm),
     Let(String, LambdaTerm),
     WeakLet(String, LambdaTerm),
-    //TODO: Free(Vec<String>),
-    //TODO: Match(LambdaTerm, Vec<String>),
+    Free(Vec<String>),
+    Match(LambdaTerm, Vec<String>),
 }
 
 pub fn parse_statement(
@@ -66,6 +66,34 @@ pub fn parse_statement(
             }
             _ => Err("No right hand side in wlet."),
         }
+    } else if inpt.starts_with("free") {
+        let inpt = &inpt[4..]; // TODO: replace with strip_prefix
+        let vars: Vec<String> = inpt.split_whitespace().map(|s| s.to_string()).collect();
+        if vars.is_empty() {
+            Err("No globals given.")
+        } else if vars.iter().any(|v| !is_valid_identifier(v)) {
+            Err("Invalid identifier in list.")
+        } else {
+            Ok(Free(vars))
+        }
+    } else if inpt.starts_with("match") {
+        let inpt = &inpt[5..]; // TODO: replace with strip_prefix
+        match inpt.splitn(2, "with").collect::<Vec<&str>>()[..] {
+            [term, vars] => {
+                let vars: Vec<String> = vars.split_whitespace().map(|s| s.to_string()).collect();
+                if vars.is_empty() {
+                    Err("No globals given.")
+                } else if vars.iter().any(|v| !is_valid_identifier(v)) {
+                    Err("Invalid identifier in list.")
+                } else {
+                    match parse_lambda_term(term, env) {
+                        Ok(term) => Ok(Match(term, vars)),
+                        Err(error) => Err(error),
+                    }
+                }
+            }
+            _ => Err("No with in match."),
+        }
     } else if inpt.starts_with("weak") {
         let inpt = &inpt[4..]; // TODO: replace with strip_prefix
         match parse_lambda_term(inpt, env) {
@@ -113,6 +141,38 @@ impl Statement {
                 let mut lam = lam.clone();
                 lam.whnf();
                 env.insert(var.to_string(), lam);
+            }
+            Free(vars) => {
+                for v in vars {
+                    env.remove(v);
+                }
+            }
+            Match(lam, vars) => {
+                println!("\n{} =", lam);
+                match reduce(&lam, &ctrlc_channel) {
+                    Ok(lam) => {
+                        println!("{} =\n", lam);
+                        print!("    ");
+                        for var in vars {
+                            if let Ok(term) = parse_lambda_term(var, env) {
+                                match reduce(&term, &ctrlc_channel) {
+                                    Ok(term) => {
+                                        if lam.alpha_eq(&term) {
+                                            println!("{}", var);
+                                            break;
+                                        }
+                                    }
+                                    Err(error) => {
+                                        println!("{}", error);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        println!();
+                    }
+                    Err(error) => println!("{}", error),
+                }
             }
         }
     }
@@ -211,6 +271,9 @@ wlet <new global> = <lambda expression>
 
 <command> -- <comment>
 → Everything after -- is ignored.
+
+load <path/to/file>
+→ Execute the given file in the current environment.
 
 help
 → Shows help for the cLC.
